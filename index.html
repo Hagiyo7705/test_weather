@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coating Inspection Master</title>
+    <style>
+        :root {
+            --primary-blue: #2c5282;
+            --border-color: #cbd5e0;
+            --accent-yellow: #fff9db;
+            --text-orange: #f08c00;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f1f3f5;
+            display: flex; 
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; /* Aligns content to the top */
+            min-height: 100vh; 
+            margin: 0; 
+            padding: 20px 10px; /* Top padding for spacing from the browser edge */
+        }
+
+        .card {
+            background: white;
+            width: 100%;
+            max-width: 350px; 
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border: 1px solid #e9ecef;
+            text-align: center;
+        }
+
+        /* Top Selection Box */
+        .mode-selector {
+            margin-bottom: 25px;
+            background: #e7f5ff;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #d0e7ff;
+        }
+
+        .mode-selector select {
+            width: 100%;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            text-align: center;
+            cursor: pointer;
+            outline: none;
+        }
+
+        /* Input Rows */
+        .input-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            justify-content: center;
+        }
+
+        .input-group label {
+            width: 65px; 
+            font-weight: 800;
+            color: #4a5568;
+            font-size: 13px;
+            text-align: right;
+            margin-right: 15px;
+        }
+
+        select {
+            width: 65%; /* 20% reduced width as requested */
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            outline: none;
+            background-color: white;
+            color: #2d3748;
+            transition: border-color 0.2s;
+        }
+
+        select:focus {
+            border-color: var(--primary-blue);
+        }
+
+        /* Result Area */
+        .result-box {
+            margin-top: 25px;
+            background-color: var(--accent-yellow);
+            border: 2px solid #fab005;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .result-title {
+            color: #718096;
+            font-weight: 800;
+            font-size: 14px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .result-value {
+            color: var(--text-orange);
+            font-size: 52px;
+            font-weight: 900;
+            margin: 0;
+            line-height: 1;
+        }
+
+        .footer {
+            margin-top: 25px;
+            text-align: center;
+            color: #a0aec0;
+            font-size: 10px;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <!-- Mode Switcher -->
+    <div class="mode-selector">
+        <select id="mainMode" onchange="initMode()">
+            <option value="drying">DRYING TIME</option>
+            <option value="immersion">IMMERSION TIME</option>
+        </select>
+    </div>
+
+    <!-- Inputs -->
+    <div class="input-group">
+        <label>PAINT</label>
+        <select id="paintSelect" onchange="calculate()"></select>
+    </div>
+
+    <div class="input-group">
+        <label>TEMP</label>
+        <select id="tempSelect" onchange="calculate()"></select>
+    </div>
+
+    <div class="input-group">
+        <label>WORK</label>
+        <select id="typeSelect" onchange="calculate()"></select>
+    </div>
+
+    <!-- Output -->
+    <div class="result-box">
+        <div id="resultLabel" class="result-title">RESULT</div>
+        <div class="result-value" id="resultDisplay">-</div>
+    </div>
+
+    <div class="footer">COATING INSPECTION ASSISTANT</div>
+</div>
+
+<script>
+    const immersionData = {
+        temps: ["-5°C", "0°C", "5°C", "10°C", "15°C", "20°C", "25°C", "30°C", "35°C", "40°C"],
+        works: ["Body Ct", "Touch up", "Minor T/up"],
+        values: {
+            "Intershield 300HS": {
+                "Body Ct": ["5D", "4D", "3D", "3D", "3D", "2.5D", "2D", "2D", "1.5D", "1.5D"],
+                "Touch up": ["4D", "3D", "2D", "2D", "2D", "1.5D", "1.5D", "1D", "1D", "1D"],
+                "Minor T/up": ["2D", "1.5D", "1D", "1D", "1D", "1D", "1D", "12H", "12H", "12H"]
+            },
+            "Intersmooth 100HS": {
+                "Body Ct": ["36H", "24H", "18H", "16H", "16H", "15H", "13H", "12H", "11H", "10H"],
+                "Touch up": ["24H", "18H", "14H", "10H", "10H", "10H", "9H", "9H", "9H", "8H"],
+                "Minor T/up": ["N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A"]
+            }
+        }
+    };
+
+    const dryingData = {
+        temps: ["35", "25", "20", "15", "10", "5", "0", "-5"],
+        works: ["Dry to Touch", "Possible to Access", "Dry to Hard"],
+        values: {
+            "Intergard 7500": { t:{"35":"0.5H","25":"1H","20":"2H","15":"2.5H","10":"3H","5":"5H","0":"10H","-5":"-"}, a:{"35":"2H","25":"2.5H","20":"5H","15":"8H","10":"11H","5":"14H","0":"17H","-5":"21H"}, h:{"35":"2H","25":"2.5H","20":"5H","15":"8H","10":"11H","5":"14H","0":"17H","-5":"21H"} },
+            "Intergard 7500HS": { t:{"35":"0.5H","25":"1H","20":"2H","15":"2.5H","10":"3H","5":"5H","0":"10H","-5":"-"}, a:{"35":"3H","25":"7H","20":"10H","15":"13H","10":"18H","5":"21H","0":"48H","-5":"-"}, h:{"35":"3H","25":"7H","20":"10H","15":"13H","10":"18H","5":"21H","0":"48H","-5":"-"} },
+            "Intergard 343HS": { t:{"35":"0.5H","25":"1H","20":"2H","15":"2.5H","10":"3H","5":"5H","0":"7H","-5":"7H"}, a:{"35":"2H","25":"2.5H","20":"5H","15":"8H","10":"11H","5":"14H","0":"17H","-5":"21H"}, h:{"35":"2H","25":"2.5H","20":"5H","15":"8H","10":"11H","5":"14H","0":"17H","-5":"21H"} },
+            "Intershield 300": { t:{"35":"2H","25":"2.5H","20":"3H","15":"3.5H","10":"4H","5":"5H","0":"6H","-5":"7H"}, a:{"35":"3H","25":"4H","20":"5H","15":"6.5H","10":"7H","5":"8H","0":"9H","-5":"-"}, h:{"35":"3H","25":"4H","20":"5H","15":"6.5H","10":"7H","5":"8H","0":"9H","-5":"10H"} },
+            "Intershield 300HS": { t:{"35":"1.5H","25":"3H","20":"4H","15":"5H","10":"6H","5":"8H","0":"10H","-5":"10H"}, a:{"35":"3H","25":"7H","20":"10H","15":"12H","10":"20H","5":"24H","0":"24H","-5":"24H"}, h:{"35":"3H","25":"7H","20":"10H","15":"12H","10":"20H","5":"24H","0":"24H","-5":"24H"} },
+            "Interline 982": { t:{"35":"0.5H","25":"1H","20":"2H","15":"2H","10":"3H","5":"-","0":"-","-5":"-"}, a:{"35":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"}, h:{"35":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"} },
+            "Intergard 9600": { t:{"35":"3H","25":"5H","20":"9H","15":"11H","10":"22H","5":"32H","0":"46H","-5":"-"}, a:{"35":"7H","25":"7H","20":"14H","15":"14H","10":"19H","5":"29H","0":"46H","-5":"70H"}, h:{"35":"7H","25":"7H","20":"14H","15":"14H","10":"19H","5":"29H","0":"46H","-5":"73H"} },
+            "Intergard 5263": { t:{"35":"4H","25":"6H","20":"7H","15":"12H","10":"15H","5":"18H","0":"24H","-5":"24H"}, a:{"35":"12H","25":"14H","20":"16H","15":"18H","10":"22H","5":"24H","0":"48H","-5":"72H"}, h:{"35":"12H","25":"14H","20":"16H","15":"18H","10":"22H","5":"24H","0":"48H","-5":"72H"} },
+            "Intersmooth 7465HS": { t:{"35":"30m","25":"40m","20":"45m","15":"50m","10":"60m","5":"90m","0":"120m","-5":"120m"}, a:{"35":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"}, h:{"35":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"} },
+            "Interswift 6800HS": { t:{"35":"1.5H","25":"2.5H","20":"3H","15":"4H","10":"4.5H","5":"6H","0":"7H","-5":"7H"}, a:{"35":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"}, h:{"35":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"} },
+            "Intersmooth 7465Si": { t:{"35":"30m","25":"40m","20":"45m","15":"50m","10":"60m","5":"80m","0":"120m","-5":"120m"}, a:{"35":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"}, h:{"35":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"} },
+            "Interswift 6900Si": { t:{"35":"1H","25":"1.5H","20":"1.5H","15":"2H","10":"2H","5":"2.5H","0":"2.5H","-5":"-"}, a:{"35":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"}, h:{"35":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"} },
+            "Intercept 7000": { t:{"35":"2H","25":"2.5H","20":"3H","15":"3.5H","10":"4H","5":"5H","0":"6H","-5":"6H"}, a:{"35":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"}, h:{"35":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"} },
+            "Intergard 740HS": { t:{"35":"5H","25":"6H","20":"7H","15":"8H","10":"10H","5":"12H","0":"12H","-5":"14H"}, a:{"35":"10H","25":"12H","20":"14H","15":"15H","10":"20H","5":"24H","0":"28H","-5":"34H"}, h:{"35":"10H","25":"12H","20":"14H","15":"15H","10":"20H","5":"24H","0":"24H","-5":"34H"} },
+            "Interthane 990E": { t:{"35":"0.3H","25":"0.5H","20":"0.5H","15":"1H","10":"1H","5":"3H","0":"6H","-5":"8H"}, a:{"35":"4H","25":"5H","20":"6H","15":"10H","10":"16H","5":"24H","0":"48H","-5":"60H"}, h:{"35":"4H","25":"5H","20":"6H","15":"10H","10":"16H","5":"24H","0":"48H","-5":"60H"} },
+            "Interfine 2080": { t:{"35":"1.5H","25":"2.5H","20":"3H","15":"3.5H","10":"4H","5":"4H","0":"6H","-5":"8H"}, a:{"35":"14H","25":"18H","20":"21H","15":"24H","10":"30H","5":"36H","0":"42H","-5":"48H"}, h:{"35":"14H","25":"18H","20":"21H","15":"24H","10":"30H","5":"36H","0":"42H","-5":"48H"} },
+            "Interzone 1000": { t:{"35":"2H","25":"5H","20":"6H","15":"8H","10":"12H","5":"-","0":"24H","-5":"-"}, a:{"35":"4H","25":"9H","20":"12H","15":"16H","10":"20H","5":"-","0":"48H","-5":"-"}, h:{"35":"4H","25":"9H","20":"12H","15":"16H","10":"20H","5":"-","0":"48H","-5":"-"} },
+            "Intercept 8500 LPP": { t:{"35":"30m","25":"40m","20":"45m","15":"75m","10":"75m","5":"90m","0":"105m","-5":"120m"}, a:{"35":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"}, h:{"35":"45m","25":"45m","20":"60m","15":"70m","10":"75m","5":"85m","0":"105m","-5":"120m"} },
+            "Intergard 361": { t:{"35":"4H","25":"6H","20":"8H","15":"8H","10":"9H","5":"10H","0":"10H","-5":"10H"}, a:{"35":"7H","25":"7H","20":"13H","15":"15H","10":"23H","5":"25H","0":"39H","-5":"48H"}, h:{"35":"7H","25":"7H","20":"13H","15":"15H","10":"23H","5":"25H","0":"39H","-5":"48H"} },
+            "Intergard 5555": { t:{"35":"3H","25":"4H","20":"4H","15":"5H","10":"5H","5":"6H","0":"6.5H","-5":"7H"}, a:{"35":"10H","25":"10H","20":"12H","15":"16H","10":"18H","5":"20H","0":"24H","-5":"29H"}, h:{"35":"10H","25":"10H","20":"12H","15":"16H","10":"18H","5":"20H","0":"24H","-5":"29H"} },
+            "Interlac 665": { t:{"35":"1.5H","25":"1.5H","20":"2H","15":"4H","10":"10H","5":"12H","0":"24H","-5":"36H"}, a:{"35":"12H","25":"12H","20":"14H","15":"17H","10":"20H","5":"24H","0":"72H","-5":"88H"}, h:{"35":"12H","25":"12H","20":"14H","15":"17H","10":"20H","5":"24H","0":"78H","-5":"88H"} },
+            "Interline 605": { t:{"35":"15m","25":"20m","20":"30m","15":"35m","10":"40m","5":"45m","0":"-","-5":"-"}, a:{"35":"2H","25":"2H","20":"2H","15":"3H","10":"3H","5":"4H","0":"-","-5":"-"}, h:{"35":"2H","25":"2H","20":"2H","15":"3H","10":"3H","5":"4H","0":"-","-5":"-"} },
+            "Interline 994": { t:{"35":"-","25":"-","20":"-","15":"-","10":"-","5":"-","0":"-","-5":"-"}, a:{"35":"3H","25":"3H","20":"4H","15":"5.5H","10":"-","5":"-","0":"-","-5":"-"}, h:{"35":"8H","25":"8H","20":"11H","15":"15H","10":"24H","5":"24H","0":"-","-5":"-"} },
+            "Interline 994(LT)": { t:{"35":"-","25":"-","20":"-","15":"-","10":"-","5":"-","0":"-","-5":"-"}, a:{"35":"-","25":"-","20":"-","15":"-","10":"4H","5":"6H","0":"-","-5":"-"}, h:{"35":"3H","25":"3H","20":"4H","15":"5H","10":"6H","5":"13H","0":"24H","-5":"24H"} },
+            "Interprime 198NB": { t:{"35":"30m","25":"40m","20":"40m","15":"45m","10":"50m","5":"60m","0":"90m","-5":"120m"}, a:{"35":"2H","25":"3H","20":"4H","15":"4H","10":"16H","5":"24H","0":"36H","-5":"48H"}, h:{"35":"2H","25":"3H","20":"4H","15":"4H","10":"16H","5":"24H","0":"36H","-5":"48H"} },
+            "Intersflex 8700 SPC": { t:{"35":"35m","25":"40m","20":"40m","15":"45m","10":"50m","5":"60m","0":"80m","-5":"120m"}, a:{"35":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"}, h:{"35":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"} },
+            "Intersleek 1100SR": { t:{"35":"1.5H","25":"2H","20":"2.5H","15":"3H","10":"4.5H","5":"5H","0":"-","-5":"-"}, a:{"35":"2H","25":"4H","20":"5H","15":"6H","10":"7.5H","5":"10.5H","0":"15H","-5":"-"}, h:{"35":"2H","25":"4H","20":"5H","15":"6H","10":"7.5H","5":"10.5H","0":"15H","-5":"-"} },
+            "Intersleek 717": { t:{"35":"15m","25":"20m","20":"30m","15":"70m","10":"90m","5":"120m","0":"140m","-5":"-"}, a:{"35":"2H","25":"2.5H","20":"4.5H","15":"7H","10":"11H","5":"18H","0":"24H","-5":"24H"}, h:{"35":"2H","25":"2.5H","20":"4.5H","15":"7H","10":"11H","5":"18H","0":"24H","-5":"24H"} },
+            "Intersleek 737": { t:{"35":"1H","25":"1.5H","20":"2H","15":"2.5H","10":"3H","5":"4H","0":"5H","-5":"7H"}, a:{"35":"3H","25":"4H","20":"5H","15":"7H","10":"8H","5":"10H","0":"13H","-5":"-"}, h:{"35":"3H","25":"4H","20":"5H","15":"7H","10":"8H","5":"10H","0":"13H","-5":"-"} },
+            "Intersmooth 7475Si": { t:{"35":"30m","25":"35m","20":"40m","15":"65m","10":"70m","5":"80m","0":"100m","-5":"120m"}, a:{"35":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"}, h:{"35":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"} }
+        }
+    };
+
+    function initMode() {
+        const mode = document.getElementById('mainMode').value;
+        const paintSel = document.getElementById('paintSelect');
+        const tempSel = document.getElementById('tempSelect');
+        const typeSel = document.getElementById('typeSelect');
+
+        paintSel.innerHTML = ""; tempSel.innerHTML = ""; typeSel.innerHTML = "";
+
+        if (mode === 'drying') {
+            Object.keys(dryingData.values).sort().forEach(p => paintSel.add(new Option(p, p)));
+            dryingData.temps.forEach(t => tempSel.add(new Option(t + "°C", t)));
+            dryingData.works.forEach(w => typeSel.add(new Option(w, w)));
+        } else {
+            Object.keys(immersionData.values).forEach(p => paintSel.add(new Option(p, p)));
+            immersionData.temps.forEach(t => tempSel.add(new Option(t, t)));
+            immersionData.works.forEach(w => typeSel.add(new Option(w, w)));
+        }
+        calculate();
+    }
+
+    function calculate() {
+        const mode = document.getElementById('mainMode').value;
+        const paint = document.getElementById('paintSelect').value;
+        const temp = document.getElementById('tempSelect').value;
+        const type = document.getElementById('typeSelect').value;
+        const display = document.getElementById('resultDisplay');
+        const label = document.getElementById('resultLabel');
+
+        label.innerText = type + " TIME";
+
+        if (mode === 'drying') {
+            const typeKey = type === "Dry to Touch" ? "t" : (type === "Possible to Access" ? "a" : "h");
+            display.innerText = dryingData.values[paint][typeKey][temp] || "-";
+        } else {
+            display.innerText = immersionData.values[paint][type][immersionData.temps.indexOf(temp)] || "-";
+        }
+        display.style.color = (display.innerText === "N/A" || display.innerText === "-") ? "#bdc3c7" : "#f08c00";
+    }
+
+    window.onload = initMode;
+</script>
+
+</body>
+</html>
