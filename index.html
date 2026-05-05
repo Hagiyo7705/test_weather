@@ -1,265 +1,381 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coating Inspection Master</title>
-    <style>
-        :root {
-            --primary-blue: #2c5282;
-            --border-color: #cbd5e0;
-            --accent-yellow: #fff9db;
-            --text-orange: #f08c00;
-        }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Hygrometer Calculator – Photo Save</title>
+<meta name="theme-color" content="#0f172a" />
+<style>
+  /* Universal box-sizing for consistent layout */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f1f3f5;
-            display: flex; 
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start; /* Aligns content to the top */
-            min-height: 100vh; 
-            margin: 0; 
-            padding: 20px 10px; /* Top padding for spacing from the browser edge */
-        }
+  :root{
+    /* Dark Mode Colors (Default) */
+    --bg:#0f172a;
+    --panel:#0b1020;
+    --border:#1f2937;
+    --text:#e5e7eb;
+    --muted:#94a3b8;
+    --cool:#3b82f6;
+    --danger:#ef4444;
+    --shadow:0 0px 10px rgba(0,0,0,.25);
+  }
 
-        .card {
-            background: white;
-            width: 100%;
-            max-width: 350px; 
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            border: 1px solid #e9ecef;
-            text-align: center;
-        }
+  /* Light Mode Colors */
+  body.light-theme {
+    --bg:#f8fafc;
+    --panel:#ffffff;
+    --border:#e2e8f0;
+    --text:#1e293b;
+    --muted:#64748b;
+    --cool:#2563eb;
+    --danger:#dc2626;
+  }
 
-        /* Top Selection Box */
-        .mode-selector {
-            margin-bottom: 25px;
-            background: #e7f5ff;
-            padding: 10px;
-            border-radius: 10px;
-            border: 1px solid #d0e7ff;
-        }
+  html,body{height:100%}
+  body{
+    margin:0;
+    background:linear-gradient(180deg,var(--panel),var(--bg) 40%,var(--panel));
+    color:var(--text);
+    font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  .container{ max-width:480px; margin:0 auto; padding:16px 12px 24px; }
+  .card{
+    background:var(--panel); border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow);
+    padding:14px;
+    margin-bottom: 0px;
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .title{font-weight:800; letter-spacing:.2px; font-size: 1.25em;}
+  label{display:block; font-size: 0.9em; color:var(--muted); margin-bottom:6px}
+  .input{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:14px 12px;
+    width: auto;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+  }
+  .input input, .input .value {
+    flex-grow: 1;
+    min-width: 0;
+    border:none;
+    outline:none;
+    background:transparent;
+    color:var(--text);
+    font-size:1.15em;
+    font-variant-numeric:tabular-nums;
+    line-height:1.2;
+    text-align: center;
+  }
+  .input .value {
+    font-weight: normal;
+  }
+  .unit-badge{
+    flex-shrink: 0;
+    font-size: 0.9em;
+    color:var(--muted);
+  }
+  .two-column-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      align-items: flex-start;
+  }
+  .input-column, .result-column {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+  }
+  .column-title {
+    font-size: 1.15em;
+    font-weight: 800;
+    color: #cbd5e1;
+    text-align: center;
+    margin-bottom: 5px;
+  }
+  body.light-theme .column-title { color: var(--text); }
+  .two-column-layout .input-row-item, .two-column-layout .result-row-item {
+      display: grid;
+      grid-template-columns: auto 100px;
+      gap: 8px;
+      align-items: center;
+  }
+  .two-column-layout .input-row-item label, .two-column-layout .result-row-item .result-label-col {
+      margin-bottom: 0;
+      font-size: 1.15em;
+      text-align: center;
+  }
+  #deltat { font-size: 1.275em; font-weight: bold; }
+  .contact-email { text-align: right; color: var(--muted); font-size: 0.85em; width: 100%; margin-top: 10px;}
+  .button-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.2fr;
+    grid-template-rows: auto auto;
+    gap: 10px;
+    align-items: stretch;
+    margin-top: 10px;
+  }
+  .btn{
+    appearance:none; border:1px solid var(--border); background:var(--bg);
+    color:var(--text);
+    padding:12px 14px; border-radius:12px; font-weight:700; width:100%; box-shadow:var(--shadow); font-size: 1em;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  .btn:active{transform:translateY(1px)}
+  .button-grid #btnSaveData { grid-column: 1 / 2; grid-row: 1 / 2; }
+  .button-grid #btnShare { grid-column: 2 / 3; grid-row: 1 / 2; }
+  .button-grid #btnToggleTheme { grid-column: 1 / 2; grid-row: 2 / 3; }
+  .button-grid .unit-toggle {
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+    display: flex; gap: 4px; background: var(--bg); border: 1px solid var(--border); padding: 4px; border-radius: 999px;
+  }
+  .button-grid #btnClear { grid-column: 3 / 4; grid-row: 1 / 3; }
+  .unit-toggle button{
+    flex:1; background: transparent; border: none; color: var(--muted); padding: 8px; border-radius: 999px; font-weight: 800;
+  }
+  .unit-toggle button.active{ background:var(--border); color:var(--text) }
 
-        .mode-selector select {
-            width: 100%;
-            border: none;
-            background: transparent;
-            font-size: 16px;
-            font-weight: 800;
-            color: var(--primary-blue);
-            text-align: center;
-            cursor: pointer;
-            outline: none;
-        }
+  #memo-section .memo-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+  }
+  .memo-label { font-weight: 700; font-size: 1.15em; color: var(--text); }
+  .memo-datetime-display { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 1.15em; font-weight: bold; }
+  .memo-input-container .input input { text-align: left; }
 
-        /* Input Rows */
-        .input-group {
-            display: flex;
-            align-items: center;
-            margin-bottom: 12px;
-            justify-content: center;
-        }
-
-        .input-group label {
-            width: 65px; 
-            font-weight: 800;
-            color: #4a5568;
-            font-size: 13px;
-            text-align: right;
-            margin-right: 15px;
-        }
-
-        select {
-            width: 65%; /* 20% reduced width as requested */
-            padding: 10px;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 700;
-            outline: none;
-            background-color: white;
-            color: #2d3748;
-            transition: border-color 0.2s;
-        }
-
-        select:focus {
-            border-color: var(--primary-blue);
-        }
-
-        /* Result Area */
-        .result-box {
-            margin-top: 25px;
-            background-color: var(--accent-yellow);
-            border: 2px solid #fab005;
-            border-radius: 12px;
-            padding: 20px;
-        }
-
-        .result-title {
-            color: #718096;
-            font-weight: 800;
-            font-size: 14px;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }
-
-        .result-value {
-            color: var(--text-orange);
-            font-size: 52px;
-            font-weight: 900;
-            margin: 0;
-            line-height: 1;
-        }
-
-        .footer {
-            margin-top: 25px;
-            text-align: center;
-            color: #a0aec0;
-            font-size: 10px;
-            letter-spacing: 1px;
-            font-weight: 600;
-        }
-    </style>
+  .photo-grid-container { display: flex; gap: 10px; margin: 14px; }
+  .photo-container {
+      flex: 1; height: 150px; position: relative; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px dashed var(--border); border-radius: 12px; cursor: pointer;
+  }
+  .photo-container .photo-placeholder-text {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      color: var(--muted); font-size: 1.2em; font-weight: 700; pointer-events: none; z-index: 1;
+  }
+  .photo-container img { max-width: 100%; max-height: 100%; object-fit: cover; display: none; }
+  .risk { color: var(--danger) !important; }
+  .cool { color: var(--cool) !important; }
+  .deltat-note { text-align: center; font-size: 0.8em; color: var(--muted); margin-top: 10px; }
+</style>
 </head>
 <body>
+  <main class="container">
+    <!-- Memo -->
+    <section class="card" id="memo-section">
+      <div class="memo-header">
+        <div class="memo-label">Memo</div>
+        <div class="memo-datetime-display" id="memo-datetime">—</div>
+      </div>
+      <div class="memo-input-container">
+        <div class="input">
+          <input id="memo" maxlength="20" placeholder="Enter memo" />
+        </div>
+      </div>
+    </section>
 
-<div class="card">
-    <!-- Mode Switcher -->
-    <div class="mode-selector">
-        <select id="mainMode" onchange="initMode()">
-            <option value="drying">DRYING TIME</option>
-            <option value="immersion">IMMERSION TIME</option>
-        </select>
-    </div>
+    <!-- Combined Input & Result Section -->
+    <section class="card" id="combined-section" style="margin-top:10px">
+        <div class="two-column-layout">
+            <div class="input-column">
+                <div class="column-title">INPUT</div>
+                <div class="input-row-item"><label>D.B</label><div class="input"><input id="dry" inputmode="decimal" /><span class="unit-badge" id="u1">°C</span></div></div>
+                <div class="input-row-item"><label>W.B</label><div class="input"><input id="wet" inputmode="decimal" /><span class="unit-badge" id="u2">°C</span></div></div>
+                <div class="input-row-item"><label>S/T</label><div class="input"><input id="surf" inputmode="decimal" /><span class="unit-badge" id="u3">°C</span></div></div>
+            </div>
+            <div class="result-column">
+                <div class="column-title">RESULT</div>
+                <div class="result-row-item"><div class="result-label-col">RH</div><div class="input"><div class="value" id="rh">—</div><span class="unit-badge">%</span></div></div>
+                <div class="result-row-item"><div class="result-label-col">DP</div><div class="input"><div class="value" id="dp">—</div><span class="unit-badge" id="dp-unit-badge">°C</span></div></div>
+                <div class="result-row-item"><div class="result-label-col">ΔT</div><div class="input"><div class="value" id="deltat">—</div><span class="unit-badge" id="deltat-unit-badge">°C</span></div></div>
+            </div>
+        </div>
+        <div class="deltat-note">Rule: ΔT &lt; 3°C/5°F → <b class="risk">Danger</b>, ≥ 3°C/5°F → <b class="cool">Suitable</b></div>
+    </section>
+    
+    <!-- Photo Section -->
+    <section class="card photo-section" id="photo-section" style="margin-top:10px;">
+        <div class="photo-grid-container">
+            <div class="photo-container" id="photo-container-1">
+                <input type="file" id="photo-input-1" accept="image/*" capture="camera" style="display:none;" />
+                <img id="captured-photo-1" src="" />
+                <div class="photo-placeholder-text" id="photo-placeholder-text-1">Photo</div>
+            </div>
+            <div class="photo-container" id="photo-container-2">
+                <input type="file" id="photo-input-2" accept="image/*" capture="camera" style="display:none;" />
+                <img id="captured-photo-2" src="" />
+                <div class="photo-placeholder-text" id="photo-placeholder-text-2">Photo</div>
+            </div>
+        </div>
+    </section>
 
-    <!-- Inputs -->
-    <div class="input-group">
-        <label>PAINT</label>
-        <select id="paintSelect" onchange="calculate()"></select>
-    </div>
+    <!-- Action Buttons -->
+    <section class="card" style="margin-top:10px;">
+      <div class="button-grid">
+        <button class="btn" id="btnSaveData">Save CSV</button>
+        <button class="btn" id="btnShare">Share IMG</button>
+        <button class="btn" id="btnToggleTheme"><span id="themeText">Light Mode</span></button>
+        <div class="unit-toggle">
+          <button id="btnC" class="active">°C</button>
+          <button id="btnF">°F</button>
+        </div>
+        <button class="btn" id="btnClear">Clear All</button>
+      </div>
+      <div class="contact-email">hagiyo7705@gmail.com</div>
+    </section>
+  </main>
 
-    <div class="input-group">
-        <label>TEMP</label>
-        <select id="tempSelect" onchange="calculate()"></select>
-    </div>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script>
+    const el = id => document.getElementById(id);
+    const toNum = v => {
+      if (!v) return null;
+      const n = Number(String(v).replace(",", "."));
+      return Number.isFinite(n) ? n : null;
+    };
+    const fmt = n => (n === null || Number.isNaN(n) ? "—" : n.toFixed(1));
+    const ts = () => {
+      const d = new Date();
+      const p = (n) => String(n).padStart(2, "0");
+      return `${d.getFullYear()}.${p(d.getMonth()+1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+    };
+    const filenameTs = () => {
+      const d = new Date();
+      const p = (n) => String(n).padStart(2, "0");
+      return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`;
+    };
 
-    <div class="input-group">
-        <label>WORK</label>
-        <select id="typeSelect" onchange="calculate()"></select>
-    </div>
+    let unit = "C";
+    let capturedPhotoUrl1 = null;
+    let capturedPhotoUrl2 = null;
 
-    <!-- Output -->
-    <div class="result-box">
-        <div id="resultLabel" class="result-title">RESULT</div>
-        <div class="result-value" id="resultDisplay">-</div>
-    </div>
+    // Psychrometrics logic
+    const es = (T)=> 6.112 * Math.exp((17.62 * T) / (243.12 + T));
+    const invMagnus = (e)=> (243.12 * Math.log(e/6.112)) / (17.62 - Math.log(e/6.112));
+    function rhFromDryWet(Td, Tw){
+      const gamma = 0.00066 * (1 + 0.00115 * Tw) * 101.325;
+      const e_act = (es(Tw) * 0.1) - gamma * (Td - Tw);
+      const e_sat = es(Td) * 0.1;
+      return Math.max(0, Math.min(100, (e_act / e_sat) * 100));
+    }
+    const CtoF = c => c * 9/5 + 32;
+    const FtoC = f => (f - 32) * 5/9;
 
-    <div class="footer">COATING INSPECTION ASSISTANT</div>
-</div>
+    function recalc(){
+      const dry = toNum(el("dry").value);
+      const wet = toNum(el("wet").value);
+      const surf = toNum(el("surf").value);
+      const Td = unit==="C" ? dry : (dry!==null ? FtoC(dry) : null);
+      const Tw = unit==="C" ? wet : (wet!==null ? FtoC(wet) : null);
+      const Ts = unit==="C" ? surf: (surf!==null? FtoC(surf): null);
 
-<script>
-    // Data remains the same for consistency
-    const immersionData = {
-        temps: ["-5°C", "0°C", "5°C", "10°C", "15°C", "20°C", "25°C", "30°C", "35°C", "40°C"],
-        works: ["Body Ct", "Touch up", "Minor T/up"],
-        values: {
-            "Intershield 300HS": {
-                "Body Ct": ["5D", "4D", "3D", "3D", "3D", "2.5D", "2D", "2D", "1.5D", "1.5D"],
-                "Touch up": ["4D", "3D", "2D", "2D", "2D", "1.5D", "1.5D", "1D", "1D", "1D"],
-                "Minor T/up": ["2D", "1.5D", "1D", "1D", "1D", "1D", "1D", "12H", "12H", "12H"]
-            },
-            "Intersmooth 100HS": {
-                "Body Ct": ["36H", "24H", "18H", "16H", "16H", "15H", "13H", "12H", "11H", "10H"],
-                "Touch up": ["24H", "18H", "14H", "10H", "10H", "10H", "9H", "9H", "9H", "8H"],
-                "Minor T/up": ["N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A"]
+      if(Td===null || Tw===null){
+        el("rh").textContent = "—"; el("dp").textContent = "—"; el("deltat").textContent = "—";
+        return;
+      }
+      const RH = rhFromDryWet(Td, Tw);
+      const DPc = invMagnus((RH/100) * es(Td));
+      const DP = unit==="C" ? DPc : CtoF(DPc);
+      const DT = (Ts===null) ? null : (unit==="C" ? (Ts - DPc) : (CtoF(Ts) - CtoF(DPc)));
+
+      el("rh").textContent = RH.toFixed(0);
+      el("dp").textContent = fmt(DP);
+      if(DT!==null){
+        el("deltat").textContent = fmt(DT);
+        el("deltat").className = "value " + (DT < (unit==="C"?3:5) ? "risk" : "cool");
+      }
+    }
+
+    function setUnit(next){
+      if(unit===next) return;
+      ["dry","wet","surf"].forEach(id => {
+        const v = toNum(el(id).value);
+        if(v!==null) el(id).value = fmt(next==="F" ? CtoF(v) : FtoC(v));
+      });
+      unit = next;
+      document.querySelectorAll(".unit-badge").forEach(b => {
+        if(b.textContent.includes("°")) b.textContent = `°${unit}`;
+      });
+      el("btnC").classList.toggle("active", unit==="C");
+      el("btnF").classList.toggle("active", unit==="F");
+      recalc();
+    }
+
+    // New: Save captured photo to gallery (download)
+    function saveImageFile(file) {
+        const memoValue = el("memo").value.trim() || "Photo";
+        const dateStr = filenameTs();
+        const extension = file.name.split('.').pop() || 'jpg';
+        const fileName = `${memoValue}_${dateStr}.${extension}`;
+
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(file);
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function handlePhotoInput(inputIdx) {
+        const input = el(`photo-input-${inputIdx}`);
+        const img = el(`captured-photo-${inputIdx}`);
+        const placeholder = el(`photo-placeholder-text-${inputIdx}`);
+        
+        input.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                // 1. Show in HTML
+                const url = URL.createObjectURL(file);
+                img.src = url;
+                img.style.display = 'block';
+                placeholder.style.display = 'none';
+                
+                // 2. Save to Gallery (Download)
+                saveImageFile(file);
             }
-        }
-    };
-
-    // Note: Add full dryingData here as previously provided to ensure all paints are searchable
-    const dryingData = {
-        temps: ["35", "30", "25", "20", "15", "10", "5", "0", "-5"],
-        works: ["Dry to Touch", "Possible to Access", "Dry to Hard"],
-        values: {
-    "Intergard 7500": { t:{"35":"0.5H","30":"1H","25":"1H","20":"2H","15":"2.5H","10":"3H","5":"4H","0":"5H","-5":"7"}, a:{"35":"2H","30":"2.5H","25":"3H","20":"5H","15":"8H","10":"11H","5":"14H","0":"17H","-5":"21H"}, h:{"35":"2H","30":"2.5H","25":"3H","20":"5H","15":"8H","10":"11H","5":"14H","0":"17H","-5":"21H"} },
-    "Intergard 7500HS": { t:{"35":"4H","30":"4H","25":"5H","20":"6H","15":"7H","10":"8H","5":"10H","0":"12H","-5":"14"}, a:{"35":"3H","30":"5H","25":"7H","20":"10H","15":"13H","10":"16H","5":"21H","0":"40H","-5":"-"}, h:{"35":"3H","30":"5H","25":"7H","20":"10H","15":"13H","10":"16H","5":"21H","0":"40H","-5":"-"} },
-    "Intergard 343HS": { t:{"35":"0.5H","30":"1H","25":"1H","20":"2H","15":"2.5H","10":"3H","5":"4H","0":"5H","-5":"7H"}, a:{"35":"2H","30":"2.5H","25":"3H","20":"5H","15":"8H","10":"11H","5":"14H","0":"17H","-5":"21H"}, h:{"35":"2H","30":"2.5H","25":"3H","20":"5H","15":"8H","10":"11H","5":"14H","0":"17H","-5":"21H"} },
-    "Intershield 300": { t:{"35":"2H","30":"2.5H","25":"3H","20":"3H","15":"3.5H","10":"4H","5":"5H","0":"6H","-5":"7H"}, a:{"35":"3H","30":"4H","25":"6H","20":"6H","15":"6.5H","10":"7H","5":"8H","0":"9H","-5":"10"}, h:{"35":"3H","30":"4H","25":"6H","20":"6H","15":"6.5H","10":"7H","5":"8H","0":"9H","-5":"10H"} },
-    "Intershield 300HS": { t:{"35":"1H","30":"1.5H","25":"2H","20":"3H","15":"4H","10":"5H","5":"6H","0":"8H","-5":"10H"}, a:{"35":"2H","30":"3H","25":"4H","20":"7H","15":"10H","10":"12H","5":"14H","0":"20H","-5":"24H"}, h:{"35":"2H","30":"3H","25":"4H","20":"7H","15":"10H","10":"12H","5":"14H","0":"20H","-5":"24H"} },
-    "Interline 982": { t:{"35":"0.5H","30":"1H","25":"1H","20":"2H","15":"2H","10":"2H","5":"3","0":"-","-5":"-"}, a:{"35":"N/A","30":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"}, h:{"35":"N/A","30":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"} },
-    "Intergard 9600": { t:{"35":"3H","30":"4.5H","25":"6H","20":"9H","15":"11H","10":"22H","5":"32H","0":"46H","-5":"-"}, a:{"35":"6H","30":"7H","25":"8H","20":"9H","15":"14H","10":"19H","5":"29H","0":"46H","-5":"70H"}, h:{"35":"6H","30":"7H","25":"8H","20":"9H","15":"14H","10":"19H","5":"29H","0":"46H","-5":"73H"} },
-    "Intergard 5263": { t:{"35":"4H","30":"5H","25":"6H","20":"7H","15":"8H","10":"10H","5":"12H","0":"18H","-5":"24H"}, a:{"35":"12H","30":"14H","25":"16H","20":"18H","15":"20H","10":"22H","5":"24H","0":"48H","-5":"72H"}, h:{"35":"12H","30":"14H","25":"16H","20":"18H","15":"20H","10":"22H","5":"24H","0":"48H","-5":"72H"} },
-    "Intersmooth 7465HS": { t:{"35":"30m","30":"35m","25":"40m","20":"40m","15":"45m","10":"50m","5":"60m","0":"80m","-5":"120m"}, a:{"35":"N/A","30":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"}, h:{"35":"N/A","30":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"} },
-    "Interswift 6800HS": { t:{"35":"1.5H","30":"2H","25":"2H","20":"2.5H","15":"3H","10":"4H","5":"4.5H","0":"6H","-5":"7H"}, a:{"35":"N/A","30":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"}, h:{"35":"N/A","30":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"} },
-    "Intersmooth 7465Si": { t:{"35":"30m","30":"35m","25":"40m","20":"40m","15":"45m","10":"50m","5":"60m","0":"80m","-5":"120m"}, a:{"35":"N/A","30":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"}, h:{"35":"N/A","30":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"} },
-    "Interswift 6900Si": { t:{"35":"1H","30":"1.5H","25":"1.5H","20":"1.5H","15":"2H","10":"2H","5":"2H","0":"2.5H","-5":"2.5"}, a:{"35":"N/A","30":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"}, h:{"35":"N/A","30":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"} },
-    "Intercept 7000": { t:{"35":"2H","30":"2H","25":"2.5H","20":"2.5H","15":"3H","10":"3.5H","5":"4H","0":"5H","-5":"6H"}, a:{"35":"N/A","30":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"}, h:{"35":"N/A","30":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"} },
-    "Intergard 740HS": { t:{"35":"4H","30":"4H","25":"5H","20":"6H","15":"7H","10":"8H","5":"10H","0":"12H","-5":"14H"}, a:{"35":"10H","30":"10H","25":"12H","20":"14H","15":"16H","10":"20H","5":"24H","0":"28H","-5":"34H"}, h:{"35":"10H","30":"10H","25":"12H","20":"14H","15":"16H","10":"20H","5":"24H","0":"24H","-5":"34H"} },
-    "Interthane 990E": { t:{"35":"0.3H","30":"0.3H","25":"0.3H","20":"0.5H","15":"0.5H","10":"1H","5":"1H","0":"6H","-5":"8H"}, a:{"35":"4H","30":"5H","25":"6H","20":"8H","15":"10H","10":"16H","5":"24H","0":"36H","-5":"60H"}, h:{"35":"4H","30":"5H","25":"6H","20":"8H","15":"10H","10":"16H","5":"24H","0":"36H","-5":"60H"} },
-    "Interfine 2080": { t:{"35":"1.5H","30":"2H","25":"2H","20":"2.5H","15":"3H","10":"3.5H","5":"4H","0":"6H","-5":"8H"}, a:{"35":"14H","30":"16H","25":"18H","20":"21H","15":"24H","10":"30H","5":"36H","0":"42H","-5":"48H"}, h:{"35":"14H","30":"16H","25":"18H","20":"21H","15":"24H","10":"30H","5":"36H","0":"42H","-5":"48H"} },
-    "Interzone 1000": { t:{"35":"2H","30":"2.5H","25":"3H","20":"5H","15":"8H","10":"10H","5":"13","0":"24H","-5":"-"}, a:{"35":"4H","30":"6H","25":"8H","20":"10H","15":"16H","10":"20H","5":"29","0":"48H","-5":"-"}, h:{"35":"4H","30":"6H","25":"8H","20":"10H","15":"16H","10":"20H","5":"29","0":"48H","-5":"-"} },
-    "Intercept 8500 LPP": { t:{"35":"30m","30":"45m","25":"60m","20":"70m","15":"75m","10":"85m","5":"90m","0":"105m","-5":"120m"}, a:{"35":"N/A","30":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"}, h:{"35":"45m","30":"45m","25":"45m","20":"60m","15":"70m","10":"75m","5":"85m","0":"105m","-5":"120m"} },
-    "Intergard 361": { t:{"35":"2H","30":"4H","25":"4H","20":"5H","15":"5H","10":"6H","5":"6H","0":"8H","-5":"10H"}, a:{"35":"6H","30":"7H","25":"9H","20":"15H","15":"20H","10":"25H","5":"30H","0":"39H","-5":"48H"}, h:{"35":"6H","30":"7H","25":"9H","20":"15H","15":"20H","10":"25H","5":"30H","0":"39H","-5":"48H"} },
-    "Intergard 5555": { t:{"35":"2H","30":"3H","25":"4H","20":"4H","15":"5H","10":"5H","5":"6H","0":"6.5H","-5":"7H"}, a:{"35":"8H","30":"10H","25":"12H","20":"16H","15":"18H","10":"20H","5":"24H","0":"26H","-5":"28H"}, h:{"35":"8H","30":"10H","25":"12H","20":"16H","15":"18H","10":"20H","5":"24H","0":"26H","-5":"28H"} },
-    "Interlac 665": { t:{"35":"1H","30":"2H","25":"3H","20":"4H","15":"5H","10":"6H","5":"12H","0":"24H","-5":"36H"}, a:{"35":"10H","30":"12H","25":"14H","20":"17H","15":"20H","10":"24H","5":"36H","0":"78H","-5":"86H"}, h:{"35":"10H","30":"12H","25":"14H","20":"17H","15":"20H","10":"24H","5":"36H","0":"78H","-5":"86H"} },
-    "Interline 605": { t:{"35":"10m","30":"20m","25":"30m","20":"35m","15":"35m","10":"40m","5":"45m","0":"-","-5":"-"}, a:{"35":"2H","30":"2H","25":"2H","20":"2H","15":"3H","10":"3H","5":"4H","0":"-","-5":"-"}, h:{"35":"2H","30":"2H","25":"2H","20":"2H","15":"3H","10":"3H","5":"4H","0":"-","-5":"-"} },
-    "Interline 994": { t:{"35":"2H","30":"2.5H","25":"3H","20":"4H","15":"5.5H","10":"6","5":"-","0":"-","-5":"-"}, a:{"35":"3H","30":"3H","25":"3H","20":"4H","15":"5.5H","10":"-","5":"-","0":"-","-5":"-"}, h:{"35":"8H","30":"8H","25":"8H","20":"11H","15":"15H","10":"24H","5":"24H","0":"-","-5":"-"} },
-    "Interline 994(LT)": { t:{"35":"1H","30":"1H","25":"2H","20":"3H","15":"4H","10":"4H","5":"6H","0":"-","-5":"-"}, a:{"35":"2","30":"3","25":"4","20":"5","15":"5.5","10":"6H","5":"18H","0":"-","-5":"-"}, h:{"35":"2H","30":"3H","25":"4H","20":"5H","15":"5.5H","10":"6H","5":"18H","0":"-","-5":"-"} },
-    "Interprime 198NB": { t:{"35":"30m","30":"1H","25":"1H","20":"1H","15":"2H","10":"2H","5":"3H","0":"6H","-5":"8H"}, a:{"35":"2H","30":"3H","25":"4H","20":"4H","15":"8H","10":"16H","5":"24H","0":"36H","-5":"48H"}, h:{"35":"2H","30":"3H","25":"4H","20":"4H","15":"8H","10":"16H","5":"24H","0":"36H","-5":"48H"} },
-    "Intersflex 8700 SPC": { t:{"35":"30m","30":"35m","25":"40m","20":"40m","15":"45m","10":"50m","5":"60m","0":"80m","-5":"120m"}, a:{"35":"N/A","30":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"}, h:{"35":"N/A","30":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"} },
-    "Intersleek 1100SR": { t:{"35":"1H","30":"1.5H","25":"2H","20":"2.5H","15":"3H","10":"3.5H","5":"4.5H","0":"5H","-5":"-"}, a:{"35":"2H","30":"3H","25":"4H","20":"5H","15":"6H","10":"7.5H","5":"10.5H","0":"15H","-5":"-"}, h:{"35":"2H","30":"3H","25":"4H","20":"5H","15":"6H","10":"7.5H","5":"10.5H","0":"15H","-5":"-"} },
-    "Intersleek 717": { t:{"35":"15m","30":"20m","25":"40m","20":"70m","15":"90m","10":"110m","5":"120m","0":"140m","-5":"-"}, a:{"35":"2H","30":"2.5H","25":"3H","20":"4.5H","15":"7H","10":"11H","5":"16H","0":"24H","-5":"-"}, h:{"35":"2H","30":"2.5H","25":"3H","20":"4.5H","15":"7H","10":"11H","5":"16H","0":"24H","-5":"-"} },
-    "Intersleek 737": { t:{"35":"1H","30":"1.5H","25":"2H","20":"2.5H","15":"3H","10":"4H","5":"5H","0":"7H","-5":"-"}, a:{"35":"3H","30":"4H","25":"5H","20":"6H","15":"7H","10":"8H","5":"10H","0":"13H","-5":"-"}, h:{"35":"3H","30":"4H","25":"5H","20":"6H","15":"7H","10":"8H","5":"10H","0":"13H","-5":"-"} },
-    "Intersmooth 7475Si": { t:{"35":"30m","30":"35m","25":"60m","20":"65m","15":"70m","10":"80m","5":"90m","0":"100m","-5":"120m"}, a:{"35":"N/A","30":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"}, h:{"35":"N/A","30":"N/A","25":"N/A","20":"N/A","15":"N/A","10":"N/A","5":"N/A","0":"N/A","-5":"N/A"} }
-
-        }
-    };
-
-    function initMode() {
-        const mode = document.getElementById('mainMode').value;
-        const paintSel = document.getElementById('paintSelect');
-        const tempSel = document.getElementById('tempSelect');
-        const typeSel = document.getElementById('typeSelect');
-
-        paintSel.innerHTML = ""; tempSel.innerHTML = ""; typeSel.innerHTML = "";
-
-        if (mode === 'drying') {
-            Object.keys(dryingData.values).sort().forEach(p => paintSel.add(new Option(p, p)));
-            dryingData.temps.forEach(t => tempSel.add(new Option(t + "°C", t)));
-            dryingData.works.forEach(w => typeSel.add(new Option(w, w)));
-        } else {
-            Object.keys(immersionData.values).forEach(p => paintSel.add(new Option(p, p)));
-            immersionData.temps.forEach(t => tempSel.add(new Option(t, t)));
-            immersionData.works.forEach(w => typeSel.add(new Option(w, w)));
-        }
-        calculate();
+        });
     }
 
-    function calculate() {
-        const mode = document.getElementById('mainMode').value;
-        const paint = document.getElementById('paintSelect').value;
-        const temp = document.getElementById('tempSelect').value;
-        const type = document.getElementById('typeSelect').value;
-        const display = document.getElementById('resultDisplay');
-        const label = document.getElementById('resultLabel');
+    document.addEventListener('DOMContentLoaded', () => {
+      ["dry","wet","surf","memo"].forEach(id=> el(id).addEventListener("input", recalc));
+      el("btnC").onclick = () => setUnit("C");
+      el("btnF").onclick = () => setUnit("F");
+      el("btnClear").onclick = () => {
+          ["dry","wet","surf","memo"].forEach(id=>el(id).value="");
+          el("captured-photo-1").style.display='none';
+          el("captured-photo-2").style.display='none';
+          el("photo-placeholder-text-1").style.display='block';
+          el("photo-placeholder-text-2").style.display='block';
+          recalc();
+      };
+      
+      el("btnToggleTheme").onclick = () => {
+          document.body.classList.toggle("light-theme");
+          const isLight = document.body.classList.contains("light-theme");
+          el("themeText").textContent = isLight ? "Dark Mode" : "Light Mode";
+      };
 
-        label.innerText = type + " TIME";
+      // Photo click triggers
+      el("photo-container-1").onclick = () => el("photo-input-1").click();
+      el("photo-container-2").onclick = () => el("photo-input-2").click();
+      
+      handlePhotoInput(1);
+      handlePhotoInput(2);
 
-        if (mode === 'drying') {
-            const typeKey = type === "Dry to Touch" ? "t" : (type === "Possible to Access" ? "a" : "h");
-            display.innerText = (dryingData.values[paint] && dryingData.values[paint][typeKey]) ? dryingData.values[paint][typeKey][temp] : "-";
-        } else {
-            display.innerText = immersionData.values[paint][type][immersionData.temps.indexOf(temp)] || "-";
-        }
-        display.style.color = (display.innerText === "N/A" || display.innerText === "-") ? "#bdc3c7" : "#f08c00";
-    }
-
-    window.onload = initMode;
-</script>
-
+      setInterval(() => { el("memo-datetime").textContent = ts(); }, 1000);
+      el("memo-datetime").textContent = ts();
+    });
+  </script>
 </body>
 </html>
