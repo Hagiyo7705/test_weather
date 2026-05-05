@@ -110,54 +110,57 @@
 </style>
 </head>
 <body>
-  <main class="container" id="capture-area">
-    <!-- Memo Section -->
-    <section class="card">
-      <div class="memo-header">
-        <div class="memo-label">Memo</div>
-        <div class="memo-datetime-display" id="memo-datetime">—</div>
-      </div>
-      <div class="input">
-        <input id="memo" maxlength="20" placeholder="Enter memo" />
-      </div>
-    </section>
-
-    <!-- Calc Section -->
-    <section class="card">
-        <div class="two-column-layout">
-            <div class="input-column">
-                <div class="column-title">INPUT</div>
-                <div class="input-row-item"><label>D.B</label><div class="input"><input id="dry" inputmode="decimal" /><span class="unit-badge" id="u1">°C</span></div></div>
-                <div class="input-row-item"><label>W.B</label><div class="input"><input id="wet" inputmode="decimal" /><span class="unit-badge" id="u2">°C</span></div></div>
-                <div class="input-row-item"><label>S/T</label><div class="input"><input id="surf" inputmode="decimal" /><span class="unit-badge" id="u3">°C</span></div></div>
-            </div>
-            <div class="result-column">
-                <div class="column-title">RESULT</div>
-                <div class="result-row-item"><div class="result-label-col">RH</div><div class="input"><div class="value" id="rh">—</div><span class="unit-badge">%</span></div></div>
-                <div class="result-row-item"><div class="result-label-col">DP</div><div class="input"><div class="value" id="dp">—</div><span class="unit-badge" id="dp-unit-badge">°C</span></div></div>
-                <div class="result-row-item"><div class="result-label-col">ΔT</div><div class="input"><div class="value" id="deltat">—</div><span class="unit-badge" id="deltat-unit-badge">°C</span></div></div>
-            </div>
+  <main class="container">
+    <!-- Capture Area (Buttons Section is excluded) -->
+    <div id="capture-area">
+      <!-- Memo Section -->
+      <section class="card">
+        <div class="memo-header">
+          <div class="memo-label">Memo</div>
+          <div class="memo-datetime-display" id="memo-datetime">—</div>
         </div>
-        <div class="deltat-note">Rule: ΔT &lt; 3°C/5°F → <b class="risk">Danger</b>, ≥ 3°C/5°F → <b class="cool">Suitable</b></div>
-    </section>
-    
-    <!-- Photo Section -->
-    <section class="card" id="photo-section">
-        <div class="photo-grid-container">
-            <div class="photo-container" id="photo-container-1">
-                <input type="file" id="photo-input-1" accept="image/*" capture="camera" style="display:none;" />
-                <img id="captured-photo-1" src="" alt="Photo 1" />
-                <div class="photo-placeholder-text" id="photo-placeholder-text-1">Photo 1</div>
-            </div>
-            <div class="photo-container" id="photo-container-2">
-                <input type="file" id="photo-input-2" accept="image/*" capture="camera" style="display:none;" />
-                <img id="captured-photo-2" src="" alt="Photo 2" />
-                <div class="photo-placeholder-text" id="photo-placeholder-text-2">Photo 2</div>
-            </div>
+        <div class="input">
+          <input id="memo" maxlength="20" placeholder="Enter memo" />
         </div>
-    </section>
+      </section>
 
-    <!-- Actions -->
+      <!-- Calc Section -->
+      <section class="card">
+          <div class="two-column-layout">
+              <div class="input-column">
+                  <div class="column-title">INPUT</div>
+                  <div class="input-row-item"><label>D.B</label><div class="input"><input id="dry" inputmode="decimal" /><span class="unit-badge" id="u1">°C</span></div></div>
+                  <div class="input-row-item"><label>W.B</label><div class="input"><input id="wet" inputmode="decimal" /><span class="unit-badge" id="u2">°C</span></div></div>
+                  <div class="input-row-item"><label>S/T</label><div class="input"><input id="surf" inputmode="decimal" /><span class="unit-badge" id="u3">°C</span></div></div>
+              </div>
+              <div class="result-column">
+                  <div class="column-title">RESULT</div>
+                  <div class="result-row-item"><div class="result-label-col">RH</div><div class="input"><div class="value" id="rh">—</div><span class="unit-badge">%</span></div></div>
+                  <div class="result-row-item"><div class="result-label-col">DP</div><div class="input"><div class="value" id="dp">—</div><span class="unit-badge" id="dp-unit-badge">°C</span></div></div>
+                  <div class="result-row-item"><div class="result-label-col">ΔT</div><div class="input"><div class="value" id="deltat">—</div><span class="unit-badge" id="deltat-unit-badge">°C</span></div></div>
+              </div>
+          </div>
+          <div class="deltat-note">Rule: ΔT &lt; 3°C/5°F → <b class="risk">Danger</b>, ≥ 3°C/5°F → <b class="cool">Suitable</b></div>
+      </section>
+      
+      <!-- Photo Section -->
+      <section class="card" id="photo-section">
+          <div class="photo-grid-container">
+              <div class="photo-container" id="photo-container-1">
+                  <input type="file" id="photo-input-1" accept="image/*" capture="camera" style="display:none;" />
+                  <img id="captured-photo-1" src="" alt="Photo 1" />
+                  <div class="photo-placeholder-text" id="photo-placeholder-text-1">Photo 1</div>
+              </div>
+              <div class="photo-container" id="photo-container-2">
+                  <input type="file" id="photo-input-2" accept="image/*" capture="camera" style="display:none;" />
+                  <img id="captured-photo-2" src="" alt="Photo 2" />
+                  <div class="photo-placeholder-text" id="photo-placeholder-text-2">Photo 2</div>
+              </div>
+          </div>
+      </section>
+    </div>
+
+    <!-- Actions (Excluded from Share IMG) -->
     <section class="card">
       <div class="button-grid">
         <button class="btn" id="btnSaveData">Save CSV</button>
@@ -295,7 +298,7 @@
         };
     }
 
-    // Function: Save CSV (Restored)
+    // Function: Save CSV
     function saveCSV() {
         const dry = el("dry").value;
         const wet = el("wet").value;
@@ -320,14 +323,20 @@
         link.click();
     }
 
-    // Function: Share Image (Restored)
+    // Function: Share Image (Only shares capture-area)
     async function shareImage() {
         const area = el("capture-area");
         try {
             const canvas = await html2canvas(area, {
                 scale: 2,
                 backgroundColor: getComputedStyle(document.body).getPropertyValue('--bg'),
-                useCORS: true
+                useCORS: true,
+                logging: false,
+                // Add padding to capture area to look like a clean card
+                onclone: (clonedDoc) => {
+                  const clonedArea = clonedDoc.getElementById('capture-area');
+                  clonedArea.style.padding = '10px';
+                }
             });
             const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
             const memoName = el("memo").value.trim() || "HygroResult";
