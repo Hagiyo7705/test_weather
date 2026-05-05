@@ -1,18 +1,14 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Hygrometer Calculator – Photo Save</title>
+<title>Hygrometer Calculator – Fixed</title>
 <meta name="theme-color" content="#0f172a" />
 <style>
-  /* Universal box-sizing for consistent layout */
-  *, *::before, *::after {
-    box-sizing: border-box;
-  }
+  *, *::before, *::after { box-sizing: border-box; }
 
   :root{
-    /* Dark Mode Colors (Default) */
     --bg:#0f172a;
     --panel:#0b1020;
     --border:#1f2937;
@@ -23,7 +19,6 @@
     --shadow:0 0px 10px rgba(0,0,0,.25);
   }
 
-  /* Light Mode Colors */
   body.light-theme {
     --bg:#f8fafc;
     --panel:#ffffff;
@@ -39,154 +34,96 @@
     margin:0;
     background:linear-gradient(180deg,var(--panel),var(--bg) 40%,var(--panel));
     color:var(--text);
-    font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, sans-serif;
     font-size: 16px;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
-  .container{ max-width:480px; margin:0 auto; padding:16px 12px 24px; }
+  .container{ max-width:480px; margin:0 auto; padding:12px 10px 20px; }
+  
+  /* 카드 및 섹션 간격 조절 (약 90% 축소) */
   .card{
     background:var(--panel); border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow);
-    padding:14px;
-    margin-bottom: 0px;
-    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    padding:12px; /* 기존 14px -> 12px */
+    margin-bottom: 8px; /* 간격 축소 */
+    transition: all 0.3s ease;
   }
-  .title{font-weight:800; letter-spacing:.2px; font-size: 1.25em;}
-  label{display:block; font-size: 0.9em; color:var(--muted); margin-bottom:6px}
+  
+  .memo-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .memo-label { font-weight: 700; font-size: 1.1em; color: var(--text); }
+  .memo-datetime-display { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 1.1em; font-weight: bold; }
+
   .input{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    background:var(--bg);
-    border:1px solid var(--border);
-    border-radius:12px;
-    padding:14px 12px;
-    width: auto;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+    display:flex; align-items:center; gap:8px; background:var(--bg); border:1px solid var(--border);
+    border-radius:12px; padding:10px 12px; /* 행간 조절을 위해 패딩 축소 */
+    transition: all 0.3s ease;
   }
   .input input, .input .value {
-    flex-grow: 1;
-    min-width: 0;
-    border:none;
-    outline:none;
-    background:transparent;
-    color:var(--text);
-    font-size:1.15em;
-    font-variant-numeric:tabular-nums;
-    line-height:1.2;
-    text-align: center;
+    flex-grow: 1; min-width: 0; border:none; outline:none; background:transparent;
+    color:var(--text); font-size:1.1em; font-variant-numeric:tabular-nums; text-align: center;
   }
-  .input .value {
-    font-weight: normal;
-  }
-  .unit-badge{
-    flex-shrink: 0;
-    font-size: 0.9em;
-    color:var(--muted);
-  }
-  .two-column-layout {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      align-items: flex-start;
-  }
-  .input-column, .result-column {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-  }
-  .column-title {
-    font-size: 1.15em;
-    font-weight: 800;
-    color: #cbd5e1;
-    text-align: center;
-    margin-bottom: 5px;
-  }
+  .unit-badge{ flex-shrink: 0; font-size: 0.85em; color:var(--muted); }
+
+  .two-column-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: flex-start; }
+  .input-column, .result-column { display: flex; flex-direction: column; gap: 8px; } /* 간격 10px -> 8px */
+  .column-title { font-size: 1.1em; font-weight: 800; color: #cbd5e1; text-align: center; margin-bottom: 4px; }
   body.light-theme .column-title { color: var(--text); }
+
   .two-column-layout .input-row-item, .two-column-layout .result-row-item {
-      display: grid;
-      grid-template-columns: auto 100px;
-      gap: 8px;
-      align-items: center;
+    display: grid; grid-template-columns: auto 90px; gap: 6px; align-items: center;
   }
   .two-column-layout .input-row-item label, .two-column-layout .result-row-item .result-label-col {
-      margin-bottom: 0;
-      font-size: 1.15em;
-      text-align: center;
+    font-size: 1.05em; text-align: center;
   }
-  #deltat { font-size: 1.275em; font-weight: bold; }
-  .contact-email { text-align: right; color: var(--muted); font-size: 0.85em; width: 100%; margin-top: 10px;}
-  .button-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1.2fr;
-    grid-template-rows: auto auto;
-    gap: 10px;
-    align-items: stretch;
-    margin-top: 10px;
+
+  .deltat-note { text-align: center; font-size: 0.75em; color: var(--muted); margin-top: 8px; }
+  
+  .photo-grid-container { display: flex; gap: 8px; margin: 8px 0; }
+  .photo-container {
+    flex: 1; height: 140px; position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px dashed var(--border); border-radius: 12px; cursor: pointer;
   }
+  .photo-placeholder-text { position: absolute; color: var(--muted); font-size: 1.1em; font-weight: 700; z-index: 1; }
+  .photo-container img { max-width: 100%; max-height: 100%; object-fit: cover; display: none; }
+
+  .button-grid { display: grid; grid-template-columns: 1fr 1fr 1.1fr; gap: 8px; margin-top: 5px; }
   .btn{
-    appearance:none; border:1px solid var(--border); background:var(--bg);
-    color:var(--text);
-    padding:12px 14px; border-radius:12px; font-weight:700; width:100%; box-shadow:var(--shadow); font-size: 1em;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    appearance:none; border:1px solid var(--border); background:var(--bg); color:var(--text);
+    padding:10px 8px; border-radius:12px; font-weight:700; font-size: 0.95em; box-shadow:var(--shadow);
+    transition: all 0.2s ease;
   }
   .btn:active{transform:translateY(1px)}
-  .button-grid #btnSaveData { grid-column: 1 / 2; grid-row: 1 / 2; }
-  .button-grid #btnShare { grid-column: 2 / 3; grid-row: 1 / 2; }
-  .button-grid #btnToggleTheme { grid-column: 1 / 2; grid-row: 2 / 3; }
-  .button-grid .unit-toggle {
-    grid-column: 2 / 3;
-    grid-row: 2 / 3;
-    display: flex; gap: 4px; background: var(--bg); border: 1px solid var(--border); padding: 4px; border-radius: 999px;
+  #btnSaveData { grid-column: 1 / 2; }
+  #btnShare { grid-column: 2 / 3; }
+  #btnToggleTheme { grid-column: 1 / 2; }
+  .unit-toggle {
+    grid-column: 2 / 3; display: flex; gap: 4px; background: var(--bg); border: 1px solid var(--border);
+    padding: 4px; border-radius: 999px;
   }
-  .button-grid #btnClear { grid-column: 3 / 4; grid-row: 1 / 3; }
-  .unit-toggle button{
-    flex:1; background: transparent; border: none; color: var(--muted); padding: 8px; border-radius: 999px; font-weight: 800;
-  }
+  .unit-toggle button{ flex:1; background: transparent; border: none; color: var(--muted); border-radius: 999px; font-weight: 800; cursor: pointer; }
   .unit-toggle button.active{ background:var(--border); color:var(--text) }
+  #btnClear { grid-column: 3 / 4; grid-row: 1 / 3; }
 
-  #memo-section .memo-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-  }
-  .memo-label { font-weight: 700; font-size: 1.15em; color: var(--text); }
-  .memo-datetime-display { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 1.15em; font-weight: bold; }
-  .memo-input-container .input input { text-align: left; }
-
-  .photo-grid-container { display: flex; gap: 10px; margin: 14px; }
-  .photo-container {
-      flex: 1; height: 150px; position: relative; overflow: hidden;
-      display: flex; align-items: center; justify-content: center;
-      border: 2px dashed var(--border); border-radius: 12px; cursor: pointer;
-  }
-  .photo-container .photo-placeholder-text {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      color: var(--muted); font-size: 1.2em; font-weight: 700; pointer-events: none; z-index: 1;
-  }
-  .photo-container img { max-width: 100%; max-height: 100%; object-fit: cover; display: none; }
-  .risk { color: var(--danger) !important; }
-  .cool { color: var(--cool) !important; }
-  .deltat-note { text-align: center; font-size: 0.8em; color: var(--muted); margin-top: 10px; }
+  .risk { color: var(--danger) !important; font-weight: bold; }
+  .cool { color: var(--cool) !important; font-weight: bold; }
+  .contact-email { text-align: right; color: var(--muted); font-size: 0.8em; margin-top: 8px; }
 </style>
 </head>
 <body>
-  <main class="container">
-    <!-- Memo -->
-    <section class="card" id="memo-section">
+  <main class="container" id="capture-area">
+    <!-- Memo Section -->
+    <section class="card">
       <div class="memo-header">
         <div class="memo-label">Memo</div>
         <div class="memo-datetime-display" id="memo-datetime">—</div>
       </div>
-      <div class="memo-input-container">
-        <div class="input">
-          <input id="memo" maxlength="20" placeholder="Enter memo" />
-        </div>
+      <div class="input">
+        <input id="memo" maxlength="20" placeholder="Enter memo" />
       </div>
     </section>
 
-    <!-- Combined Input & Result Section -->
-    <section class="card" id="combined-section" style="margin-top:10px">
+    <!-- Calc Section -->
+    <section class="card">
         <div class="two-column-layout">
             <div class="input-column">
                 <div class="column-title">INPUT</div>
@@ -205,23 +142,23 @@
     </section>
     
     <!-- Photo Section -->
-    <section class="card photo-section" id="photo-section" style="margin-top:10px;">
+    <section class="card" id="photo-section">
         <div class="photo-grid-container">
             <div class="photo-container" id="photo-container-1">
                 <input type="file" id="photo-input-1" accept="image/*" capture="camera" style="display:none;" />
-                <img id="captured-photo-1" src="" />
-                <div class="photo-placeholder-text" id="photo-placeholder-text-1">Photo</div>
+                <img id="captured-photo-1" src="" alt="Photo 1" />
+                <div class="photo-placeholder-text" id="photo-placeholder-text-1">Photo 1</div>
             </div>
             <div class="photo-container" id="photo-container-2">
                 <input type="file" id="photo-input-2" accept="image/*" capture="camera" style="display:none;" />
-                <img id="captured-photo-2" src="" />
-                <div class="photo-placeholder-text" id="photo-placeholder-text-2">Photo</div>
+                <img id="captured-photo-2" src="" alt="Photo 2" />
+                <div class="photo-placeholder-text" id="photo-placeholder-text-2">Photo 2</div>
             </div>
         </div>
     </section>
 
-    <!-- Action Buttons -->
-    <section class="card" style="margin-top:10px;">
+    <!-- Actions -->
+    <section class="card">
       <div class="button-grid">
         <button class="btn" id="btnSaveData">Save CSV</button>
         <button class="btn" id="btnShare">Share IMG</button>
@@ -236,7 +173,9 @@
     </section>
   </main>
 
+  <!-- External Library for Screenshot -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  
   <script>
     const el = id => document.getElementById(id);
     const toNum = v => {
@@ -257,12 +196,12 @@
     };
 
     let unit = "C";
-    let capturedPhotoUrl1 = null;
-    let capturedPhotoUrl2 = null;
+    const DATA_LOG_KEY = 'hygro_data_log';
 
-    // Psychrometrics logic
+    // Calculation Logic
     const es = (T)=> 6.112 * Math.exp((17.62 * T) / (243.12 + T));
     const invMagnus = (e)=> (243.12 * Math.log(e/6.112)) / (17.62 - Math.log(e/6.112));
+    
     function rhFromDryWet(Td, Tw){
       const gamma = 0.00066 * (1 + 0.00115 * Tw) * 101.325;
       const e_act = (es(Tw) * 0.1) - gamma * (Td - Tw);
@@ -276,24 +215,33 @@
       const dry = toNum(el("dry").value);
       const wet = toNum(el("wet").value);
       const surf = toNum(el("surf").value);
+      
       const Td = unit==="C" ? dry : (dry!==null ? FtoC(dry) : null);
       const Tw = unit==="C" ? wet : (wet!==null ? FtoC(wet) : null);
       const Ts = unit==="C" ? surf: (surf!==null? FtoC(surf): null);
 
       if(Td===null || Tw===null){
         el("rh").textContent = "—"; el("dp").textContent = "—"; el("deltat").textContent = "—";
+        el("deltat").className = "value";
         return;
       }
+      
       const RH = rhFromDryWet(Td, Tw);
-      const DPc = invMagnus((RH/100) * es(Td));
+      const e_act_hPa = (RH/100) * es(Td);
+      const DPc = invMagnus(e_act_hPa);
       const DP = unit==="C" ? DPc : CtoF(DPc);
       const DT = (Ts===null) ? null : (unit==="C" ? (Ts - DPc) : (CtoF(Ts) - CtoF(DPc)));
 
       el("rh").textContent = RH.toFixed(0);
       el("dp").textContent = fmt(DP);
+      
       if(DT!==null){
         el("deltat").textContent = fmt(DT);
-        el("deltat").className = "value " + (DT < (unit==="C"?3:5) ? "risk" : "cool");
+        const threshold = unit==="C" ? 3 : 5;
+        el("deltat").className = "value " + (DT < threshold ? "risk" : "cool");
+      } else {
+        el("deltat").textContent = "—";
+        el("deltat").className = "value";
       }
     }
 
@@ -312,12 +260,13 @@
       recalc();
     }
 
-    // New: Save captured photo to gallery (download)
-    function saveImageFile(file) {
+    // Photo Handling (Fixed: Unique Indexing for Files)
+    function saveImageFile(file, index) {
         const memoValue = el("memo").value.trim() || "Photo";
         const dateStr = filenameTs();
         const extension = file.name.split('.').pop() || 'jpg';
-        const fileName = `${memoValue}_${dateStr}.${extension}`;
+        // 파일명 중복 방지를 위해 인덱스(_1, _2) 추가
+        const fileName = `${memoValue}_${dateStr}_${index}.${extension}`;
 
         const link = document.createElement('a');
         link.href = URL.createObjectURL(file);
@@ -327,52 +276,101 @@
         document.body.removeChild(link);
     }
 
-    function handlePhotoInput(inputIdx) {
-        const input = el(`photo-input-${inputIdx}`);
-        const img = el(`captured-photo-${inputIdx}`);
-        const placeholder = el(`photo-placeholder-text-${inputIdx}`);
+    function setupPhoto(idx) {
+        const container = el(`photo-container-${idx}`);
+        const input = el(`photo-input-${idx}`);
+        const img = el(`captured-photo-${idx}`);
+        const placeholder = el(`photo-placeholder-text-${idx}`);
         
-        input.addEventListener("change", (e) => {
+        container.onclick = () => input.click();
+        
+        input.onchange = (e) => {
             const file = e.target.files[0];
             if (file) {
-                // 1. Show in HTML
-                const url = URL.createObjectURL(file);
-                img.src = url;
+                img.src = URL.createObjectURL(file);
                 img.style.display = 'block';
                 placeholder.style.display = 'none';
-                
-                // 2. Save to Gallery (Download)
-                saveImageFile(file);
+                saveImageFile(file, idx);
             }
-        });
+        };
     }
 
+    // Function: Save CSV (Restored)
+    function saveCSV() {
+        const dry = el("dry").value;
+        const wet = el("wet").value;
+        const surf = el("surf").value;
+        if (!dry && !wet && !surf) return;
+
+        const memo = el("memo").value || '';
+        const rh = el("rh").textContent || '—';
+        const dp = el("dp").textContent || '—';
+        const deltat = el("deltat").textContent || '—';
+        const time = el("memo-datetime").textContent;
+        
+        const row = `"${memo}",${dry},${wet},${surf},${rh},${dp},${deltat},${unit},"${time}"\n`;
+        let csv = localStorage.getItem(DATA_LOG_KEY) || "Memo,Dry,Wet,Surf,RH,DP,DT,Unit,Time\n";
+        csv += row;
+        localStorage.setItem(DATA_LOG_KEY, csv);
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `hygro_data_${filenameTs()}.csv`;
+        link.click();
+    }
+
+    // Function: Share Image (Restored)
+    async function shareImage() {
+        const area = el("capture-area");
+        try {
+            const canvas = await html2canvas(area, {
+                scale: 2,
+                backgroundColor: getComputedStyle(document.body).getPropertyValue('--bg'),
+                useCORS: true
+            });
+            const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+            const memoName = el("memo").value.trim() || "HygroResult";
+            const file = new File([blob], `${memoName}_${filenameTs()}.png`, { type: 'image/png' });
+
+            if (navigator.share && navigator.canShare({ files: [file] })) {
+                await navigator.share({ files: [file], title: "Hygrometer Result" });
+            } else {
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = file.name;
+                link.click();
+            }
+        } catch (err) {
+            console.error("Screenshot error:", err);
+        }
+    }
+
+    // Init
     document.addEventListener('DOMContentLoaded', () => {
-      ["dry","wet","surf","memo"].forEach(id=> el(id).addEventListener("input", recalc));
+      ["dry","wet","surf","memo"].forEach(id => el(id).oninput = recalc);
       el("btnC").onclick = () => setUnit("C");
       el("btnF").onclick = () => setUnit("F");
-      el("btnClear").onclick = () => {
-          ["dry","wet","surf","memo"].forEach(id=>el(id).value="");
-          el("captured-photo-1").style.display='none';
-          el("captured-photo-2").style.display='none';
-          el("photo-placeholder-text-1").style.display='block';
-          el("photo-placeholder-text-2").style.display='block';
-          recalc();
-      };
-      
+      el("btnSaveData").onclick = saveCSV;
+      el("btnShare").onclick = shareImage;
       el("btnToggleTheme").onclick = () => {
           document.body.classList.toggle("light-theme");
-          const isLight = document.body.classList.contains("light-theme");
-          el("themeText").textContent = isLight ? "Dark Mode" : "Light Mode";
+          el("themeText").textContent = document.body.classList.contains("light-theme") ? "Dark Mode" : "Light Mode";
+      };
+      el("btnClear").onclick = () => {
+          ["dry","wet","surf","memo"].forEach(id => el(id).value = "");
+          [1, 2].forEach(i => {
+              el(`captured-photo-${i}`).style.display = 'none';
+              el(`photo-placeholder-text-${i}`).style.display = 'block';
+              el(`photo-input-${i}`).value = "";
+          });
+          localStorage.removeItem(DATA_LOG_KEY);
+          recalc();
       };
 
-      // Photo click triggers
-      el("photo-container-1").onclick = () => el("photo-input-1").click();
-      el("photo-container-2").onclick = () => el("photo-input-2").click();
+      setupPhoto(1);
+      setupPhoto(2);
       
-      handlePhotoInput(1);
-      handlePhotoInput(2);
-
       setInterval(() => { el("memo-datetime").textContent = ts(); }, 1000);
       el("memo-datetime").textContent = ts();
     });
