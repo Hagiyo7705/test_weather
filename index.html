@@ -2,65 +2,61 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dew Point Calculator</title>
     <style>
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            font-family: Arial, sans-serif; 
             margin: 0; 
             padding: 20px; 
-            display: flex; 
-            justify-content: center; 
-            background-color: #f0f2f5;
+            background-color: #f4f4f9;
         }
         .container { 
-            width: 100%; 
             max-width: 500px; 
-            padding: 30px; 
-            border-radius: 20px; 
+            margin: 0 auto;
+            padding: 25px; 
+            border: 1px solid #ddd; 
+            border-radius: 16px; 
             background: #ffffff; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-            box-sizing: border-box;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
         }
-        h2 { text-align: center; color: #1a1a1a; margin-top: 0; margin-bottom: 30px; }
-        label { display: block; margin-top: 20px; font-weight: 600; font-size: 1.1rem; color: #444; }
+        h2 { text-align: center; color: #333; }
+        label { display: block; margin-top: 20px; font-weight: bold; }
         input { 
             width: 100%; 
-            padding: 18px; 
-            margin-top: 10px; 
-            border: 2px solid #e0e0e0; 
-            border-radius: 12px; 
-            font-size: 1.2rem; 
+            padding: 15px; 
+            margin-top: 8px; 
+            border: 1px solid #ccc; 
+            border-radius: 8px; 
+            font-size: 16px; 
             box-sizing: border-box; 
-            transition: border-color 0.3s;
         }
-        input:focus { border-color: #007bff; outline: none; }
         button { 
             width: 100%; 
-            padding: 20px; 
-            margin-top: 35px; 
+            padding: 18px; 
+            margin-top: 25px; 
             background: #007bff; 
             color: white; 
             border: none; 
-            border-radius: 12px; 
-            font-size: 1.3rem; 
-            font-weight: 700; 
+            border-radius: 8px; 
+            font-size: 18px; 
+            font-weight: bold; 
             cursor: pointer; 
-            transition: background 0.3s;
         }
-        button:active { background: #0056b3; }
-        
-        /* 결과값 표시 박스 스타일 */
+        /* 결과 박스 스타일 */
         #result-box { 
-            margin-top: 35px; 
-            padding: 25px; 
+            margin-top: 25px; 
+            padding: 20px; 
             text-align: center; 
-            background: #e7f3ff; /* 연한 파란색 배경 */
-            border: 2px solid #b3d7ff;
-            border-radius: 15px; 
+            background-color: #e7f1ff; 
+            border: 2px solid #007bff;
+            border-radius: 10px;
         }
-        #result-label { font-size: 1rem; color: #555; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
-        #result-value { font-size: 2.2rem; font-weight: 800; color: #0056b3; }
+        #result-text { 
+            font-size: 28px; 
+            font-weight: bold; 
+            color: #0056b3; 
+        }
     </style>
 </head>
 <body>
@@ -69,28 +65,26 @@
     <h2>Dew Point Calculator</h2>
     
     <label>Dry Bulb Temp (°C)</label>
-    <input type="number" id="temp" step="0.1" inputmode="decimal" placeholder="e.g. 25">
+    <input type="number" id="temp" step="0.1" placeholder="e.g. 25">
     
     <label>Relative Humidity (%)</label>
-    <input type="number" id="humidity" step="0.1" inputmode="decimal" placeholder="e.g. 60">
+    <input type="number" id="humidity" step="0.1" placeholder="e.g. 60">
     
-    <button onclick="calculateDewPoint()">Calculate</button>
+    <button onclick="calculate()">Calculate</button>
     
     <div id="result-box">
-        <div id="result-label">Dew Point</div>
-        <div id="result-value">-- °C</div>
+        <div id="result-text">Enter values</div>
     </div>
 </div>
 
 <script>
-    function calculateDewPoint() {
+    function calculate() {
         const T = parseFloat(document.getElementById('temp').value);
         const RH = parseFloat(document.getElementById('humidity').value);
-        const resultValue = document.getElementById('result-value');
+        const res = document.getElementById('result-text');
 
         if (isNaN(T) || isNaN(RH)) {
-            resultValue.innerText = "Check Input";
-            resultValue.style.fontSize = "1.5rem";
+            res.innerText = "Invalid Input";
             return;
         }
 
@@ -99,8 +93,7 @@
         const alpha = Math.log(RH / 100) + ((a * T) / (b + T));
         const dewPoint = (b * alpha) / (a - alpha);
 
-        resultValue.style.fontSize = "2.2rem";
-        resultValue.innerText = `${dewPoint.toFixed(1)} °C`;
+        res.innerText = dewPoint.toFixed(1) + " °C";
     }
 </script>
 
