@@ -2,98 +2,184 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dew Point Calculator</title>
     <style>
+        /* 기본 설정 */
         body { 
             font-family: Arial, sans-serif; 
             margin: 0; 
             padding: 20px; 
-            background-color: #f4f4f9;
+            background-color: #ffffff; 
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
         }
-        .container { 
-            max-width: 500px; 
-            margin: 0 auto;
-            padding: 25px; 
-            border: 1px solid #ddd; 
-            border-radius: 16px; 
-            background: #ffffff; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+
+        /* 메인 컨테이너 */
+        .calculator-wrapper {
+            width: 100%;
+            max-width: 500px; /* 최대 너비 제한 */
         }
-        h2 { text-align: center; color: #333; }
-        label { display: block; margin-top: 20px; font-weight: bold; }
-        input { 
-            width: 100%; 
-            padding: 15px; 
-            margin-top: 8px; 
-            border: 1px solid #ccc; 
-            border-radius: 8px; 
-            font-size: 16px; 
-            box-sizing: border-box; 
+
+        /* 제목 */
+        h1.calculator-title {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 30px;
         }
-        button { 
-            width: 100%; 
-            padding: 18px; 
-            margin-top: 25px; 
-            background: #007bff; 
-            color: white; 
-            border: none; 
-            border-radius: 8px; 
-            font-size: 18px; 
-            font-weight: bold; 
-            cursor: pointer; 
+
+        /* 입력 섹션 그리드 (필드와 버튼 나란히 배치) */
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr auto; /* 왼쪽: 입력필드(자동확장), 오른쪽: 버튼(컨텐츠크기) */
+            gap: 20px; /* 필드와 버튼 사이 간격 */
+            margin-bottom: 30px;
+            align-items: start; /* 상단 정렬 */
         }
-        /* 결과 박스 스타일 */
-        #result-box { 
-            margin-top: 25px; 
-            padding: 20px; 
-            text-align: center; 
-            background-color: #e7f1ff; 
-            border: 2px solid #007bff;
-            border-radius: 10px;
+
+        /* 왼쪽 입력 필드 그룹 */
+        .input-fields {
+            display: flex;
+            flex-direction: column;
+            gap: 20px; /* 필드 사이 간격 */
         }
-        #result-text { 
-            font-size: 28px; 
-            font-weight: bold; 
-            color: #0056b3; 
+
+        /* 입력 필드 스타일 */
+        .input-group label {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            box-sizing: border-box;
+            text-align: right; /* 숫자는 오른쪽 정렬 */
+        }
+
+        /* 계산 버튼 스타일 */
+        .calculate-button {
+            grid-row: 1 / 3; /* 버튼이 두 개의 행을 차지함 */
+            height: 100%; /* 전체 높이 사용 */
+            padding: 0 40px; /* 가로 패딩 */
+            background-color: #007bff; /* 진한 파란색 */
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 2rem; /* 매우 큰 글자 */
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        .calculate-button:hover {
+            background-color: #0056b3; /* 호버 시 더 진하게 */
+        }
+
+        /* 결과 박스 스타일 (하단) */
+        #result-box {
+            margin-top: 30px;
+            padding: 30px 20px;
+            text-align: center;
+            background-color: #edf2f9; /* 연한 파란색 배경 */
+            border: 2px solid #007bff; /* 진한 파란색 테두리 */
+            border-radius: 8px;
+            min-height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #result-value {
+            font-size: 4rem; /* 매우 큰 글자 */
+            font-weight: bold;
+            color: #0056b3; /* 진한 파란색 글자 */
+        }
+
+        /* 반응형 스타일 (작은 화면용) */
+        @media (max-width: 600px) {
+            .input-section {
+                grid-template-columns: 1fr; /* 작은 화면에서는 세로 배치 */
+            }
+            .calculate-button {
+                grid-row: auto; /* 행 병합 해제 */
+                height: 60px; /* 버튼 높이 고정 */
+                font-size: 1.5rem;
+            }
+            .calculator-wrapper {
+                max-width: 100%;
+            }
+            #result-value {
+                font-size: 3rem; /* 결과 폰트 크기 조정 */
+            }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Dew Point Calculator</h2>
+<div class="calculator-wrapper">
+    <h1 class="calculator-title">Dew Point Calculator</h1>
     
-    <label>Dry Bulb Temp (°C)</label>
-    <input type="number" id="temp" step="0.1" placeholder="e.g. 25">
-    
-    <label>Relative Humidity (%)</label>
-    <input type="number" id="humidity" step="0.1" placeholder="e.g. 60">
-    
-    <button onclick="calculate()">Calculate</button>
-    
+    <div class="input-section">
+        <div class="input-fields">
+            <!-- 건구 온도 입력 그룹 -->
+            <div class="input-group">
+                <label for="temp">Dry Bulb Temp (°C)</label>
+                <input type="number" id="temp" value="25" placeholder="예: 25">
+            </div>
+            
+            <!-- 상대 습도 입력 그룹 -->
+            <div class="input-group">
+                <label for="humidity">Relative Humidity (%)</label>
+                <input type="number" id="humidity" value="45" placeholder="예: 60">
+            </div>
+        </div>
+
+        <!-- 계산 버튼 -->
+        <button class="calculate-button" onclick="calculateDewPoint()">Calculate</button>
+    </div>
+
+    <!-- 결과 표시 박스 -->
     <div id="result-box">
-        <div id="result-text">Enter values</div>
+        <span id="result-value">-- °C</span>
     </div>
 </div>
 
 <script>
-    function calculate() {
+    // 이슬점 계산 함수 (Magnus 공식 사용)
+    function calculateDewPoint() {
         const T = parseFloat(document.getElementById('temp').value);
         const RH = parseFloat(document.getElementById('humidity').value);
-        const res = document.getElementById('result-text');
+        const resultBox = document.getElementById('result-value');
 
         if (isNaN(T) || isNaN(RH)) {
-            res.innerText = "Invalid Input";
+            resultBox.innerText = "Error";
             return;
         }
 
         const a = 17.625;
         const b = 243.04;
+
+        // 알파 계산
         const alpha = Math.log(RH / 100) + ((a * T) / (b + T));
+        
+        // 이슬점 계산
         const dewPoint = (b * alpha) / (a - alpha);
 
-        res.innerText = dewPoint.toFixed(1) + " °C";
+        // 결과 출력 (소수점 첫째 자리까지 반올림)
+        resultBox.innerText = dewPoint.toFixed(1) + " °C";
     }
 </script>
 
