@@ -1,388 +1,54 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Hygrometer Calculator – Fixed</title>
-<meta name="theme-color" content="#0f172a" />
-<style>
-  *, *::before, *::after { box-sizing: border-box; }
-
-  :root{
-    --bg:#0f172a;
-    --panel:#0b1020;
-    --border:#1f2937;
-    --text:#e5e7eb;
-    --muted:#94a3b8;
-    --cool:#3b82f6;
-    --danger:#ef4444;
-    --shadow:0 0px 10px rgba(0,0,0,.25);
-  }
-
-  body.light-theme {
-    --bg:#f8fafc;
-    --panel:#ffffff;
-    --border:#e2e8f0;
-    --text:#1e293b;
-    --muted:#64748b;
-    --cool:#2563eb;
-    --danger:#dc2626;
-  }
-
-  html,body{height:100%}
-  body{
-    margin:0;
-    background:linear-gradient(180deg,var(--panel),var(--bg) 40%,var(--panel));
-    color:var(--text);
-    font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, sans-serif;
-    font-size: 16px;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-  .container{ max-width:480px; margin:0 auto; padding:12px 10px 20px; }
-  
-  /* 카드 및 섹션 간격 조절 (약 90% 축소) */
-  .card{
-    background:var(--panel); border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow);
-    padding:12px; /* 기존 14px -> 12px */
-    margin-bottom: 8px; /* 간격 축소 */
-    transition: all 0.3s ease;
-  }
-  
-  .memo-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-  .memo-label { font-weight: 700; font-size: 1.1em; color: var(--text); }
-  .memo-datetime-display { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 1.1em; font-weight: bold; }
-
-  .input{
-    display:flex; align-items:center; gap:8px; background:var(--bg); border:1px solid var(--border);
-    border-radius:12px; padding:10px 12px; /* 행간 조절을 위해 패딩 축소 */
-    transition: all 0.3s ease;
-  }
-  .input input, .input .value {
-    flex-grow: 1; min-width: 0; border:none; outline:none; background:transparent;
-    color:var(--text); font-size:1.1em; font-variant-numeric:tabular-nums; text-align: center;
-  }
-  .unit-badge{ flex-shrink: 0; font-size: 0.85em; color:var(--muted); }
-
-  .two-column-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: flex-start; }
-  .input-column, .result-column { display: flex; flex-direction: column; gap: 8px; } /* 간격 10px -> 8px */
-  .column-title { font-size: 1.1em; font-weight: 800; color: #cbd5e1; text-align: center; margin-bottom: 4px; }
-  body.light-theme .column-title { color: var(--text); }
-
-  .two-column-layout .input-row-item, .two-column-layout .result-row-item {
-    display: grid; grid-template-columns: auto 90px; gap: 6px; align-items: center;
-  }
-  .two-column-layout .input-row-item label, .two-column-layout .result-row-item .result-label-col {
-    font-size: 1.05em; text-align: center;
-  }
-
-  .deltat-note { text-align: center; font-size: 0.75em; color: var(--muted); margin-top: 8px; }
-  
-  .photo-grid-container { display: flex; gap: 8px; margin: 8px 0; }
-  .photo-container {
-    flex: 1; height: 140px; position: relative; overflow: hidden;
-    display: flex; align-items: center; justify-content: center;
-    border: 2px dashed var(--border); border-radius: 12px; cursor: pointer;
-  }
-  .photo-placeholder-text { position: absolute; color: var(--muted); font-size: 1.1em; font-weight: 700; z-index: 1; }
-  .photo-container img { max-width: 100%; max-height: 100%; object-fit: cover; display: none; }
-
-  .button-grid { display: grid; grid-template-columns: 1fr 1fr 1.1fr; gap: 8px; margin-top: 5px; }
-  .btn{
-    appearance:none; border:1px solid var(--border); background:var(--bg); color:var(--text);
-    padding:10px 8px; border-radius:12px; font-weight:700; font-size: 0.95em; box-shadow:var(--shadow);
-    transition: all 0.2s ease;
-  }
-  .btn:active{transform:translateY(1px)}
-  #btnSaveData { grid-column: 1 / 2; }
-  #btnShare { grid-column: 2 / 3; }
-  #btnToggleTheme { grid-column: 1 / 2; }
-  .unit-toggle {
-    grid-column: 2 / 3; display: flex; gap: 4px; background: var(--bg); border: 1px solid var(--border);
-    padding: 4px; border-radius: 999px;
-  }
-  .unit-toggle button{ flex:1; background: transparent; border: none; color: var(--muted); border-radius: 999px; font-weight: 800; cursor: pointer; }
-  .unit-toggle button.active{ background:var(--border); color:var(--text) }
-  #btnClear { grid-column: 3 / 4; grid-row: 1 / 3; }
-
-  .risk { color: var(--danger) !important; font-weight: bold; }
-  .cool { color: var(--cool) !important; font-weight: bold; }
-  .contact-email { text-align: right; color: var(--muted); font-size: 0.8em; margin-top: 8px; }
-</style>
+    <meta charset="UTF-8">
+    <title>이슬점 계산기</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
+        .container { max-width: 400px; border: 1px solid #ccc; padding: 20px; border-radius: 8px; }
+        input { width: 100%; padding: 8px; margin: 10px 0; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; cursor: pointer; }
+        #result { margin-top: 20px; font-weight: bold; color: #333; }
+    </style>
 </head>
 <body>
-  <main class="container">
-    <!-- Capture Area (Buttons Section is excluded) -->
-    <div id="capture-area">
-      <!-- Memo Section -->
-      <section class="card">
-        <div class="memo-header">
-          <div class="memo-label">Memo</div>
-          <div class="memo-datetime-display" id="memo-datetime">—</div>
-        </div>
-        <div class="input">
-          <input id="memo" maxlength="20" placeholder="Enter memo" />
-        </div>
-      </section>
 
-      <!-- Calc Section -->
-      <section class="card">
-          <div class="two-column-layout">
-              <div class="input-column">
-                  <div class="column-title">INPUT</div>
-                  <div class="input-row-item"><label>D.B</label><div class="input"><input id="dry" inputmode="decimal" /><span class="unit-badge" id="u1">°C</span></div></div>
-                  <div class="input-row-item"><label>W.B</label><div class="input"><input id="wet" inputmode="decimal" /><span class="unit-badge" id="u2">°C</span></div></div>
-                  <div class="input-row-item"><label>S/T</label><div class="input"><input id="surf" inputmode="decimal" /><span class="unit-badge" id="u3">°C</span></div></div>
-              </div>
-              <div class="result-column">
-                  <div class="column-title">RESULT</div>
-                  <div class="result-row-item"><div class="result-label-col">RH</div><div class="input"><div class="value" id="rh">—</div><span class="unit-badge">%</span></div></div>
-                  <div class="result-row-item"><div class="result-label-col">DP</div><div class="input"><div class="value" id="dp">—</div><span class="unit-badge" id="dp-unit-badge">°C</span></div></div>
-                  <div class="result-row-item"><div class="result-label-col">ΔT</div><div class="input"><div class="value" id="deltat">—</div><span class="unit-badge" id="deltat-unit-badge">°C</span></div></div>
-              </div>
-          </div>
-          <div class="deltat-note">Rule: ΔT &lt; 3°C/5°F → <b class="risk">Danger</b>, ≥ 3°C/5°F → <b class="cool">Suitable</b></div>
-      </section>
-      
-      <!-- Photo Section -->
-      <section class="card" id="photo-section">
-          <div class="photo-grid-container">
-              <div class="photo-container" id="photo-container-1">
-                  <input type="file" id="photo-input-1" accept="image/*" capture="camera" style="display:none;" />
-                  <img id="captured-photo-1" src="" alt="Photo 1" />
-                  <div class="photo-placeholder-text" id="photo-placeholder-text-1">Photo 1</div>
-              </div>
-              <div class="photo-container" id="photo-container-2">
-                  <input type="file" id="photo-input-2" accept="image/*" capture="camera" style="display:none;" />
-                  <img id="captured-photo-2" src="" alt="Photo 2" />
-                  <div class="photo-placeholder-text" id="photo-placeholder-text-2">Photo 2</div>
-              </div>
-          </div>
-      </section>
-    </div>
-
-    <!-- Actions (Excluded from Share IMG) -->
-    <section class="card">
-      <div class="button-grid">
-        <button class="btn" id="btnSaveData">Save CSV</button>
-        <button class="btn" id="btnShare">Share IMG</button>
-        <button class="btn" id="btnToggleTheme"><span id="themeText">Light Mode</span></button>
-        <div class="unit-toggle">
-          <button id="btnC" class="active">°C</button>
-          <button id="btnF">°F</button>
-        </div>
-        <button class="btn" id="btnClear">Clear All</button>
-      </div>
-      <div class="contact-email">hagiyo7705@gmail.com</div>
-    </section>
-  </main>
-
-  <!-- External Library for Screenshot -->
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  
-  <script>
-    const el = id => document.getElementById(id);
-    const toNum = v => {
-      if (!v) return null;
-      const n = Number(String(v).replace(",", "."));
-      return Number.isFinite(n) ? n : null;
-    };
-    const fmt = n => (n === null || Number.isNaN(n) ? "—" : n.toFixed(1));
-    const ts = () => {
-      const d = new Date();
-      const p = (n) => String(n).padStart(2, "0");
-      return `${d.getFullYear()}.${p(d.getMonth()+1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
-    };
-    const filenameTs = () => {
-      const d = new Date();
-      const p = (n) => String(n).padStart(2, "0");
-      return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}`;
-    };
-
-    let unit = "C";
-    const DATA_LOG_KEY = 'hygro_data_log';
-
-    // Calculation Logic
-    const es = (T)=> 6.112 * Math.exp((17.62 * T) / (243.12 + T));
-    const invMagnus = (e)=> (243.12 * Math.log(e/6.112)) / (17.62 - Math.log(e/6.112));
+<div class="container">
+    <h2>이슬점 계산기</h2>
+    <label>건구 온도 (°C):</label>
+    <input type="number" id="temp" step="0.1" placeholder="예: 25">
     
-    function rhFromDryWet(Td, Tw){
-      const gamma = 0.00066 * (1 + 0.00115 * Tw) * 101.325;
-      const e_act = (es(Tw) * 0.1) - gamma * (Td - Tw);
-      const e_sat = es(Td) * 0.1;
-      return Math.max(0, Math.min(100, (e_act / e_sat) * 100));
-    }
-    const CtoF = c => c * 9/5 + 32;
-    const FtoC = f => (f - 32) * 5/9;
+    <label>상대 습도 (%):</label>
+    <input type="number" id="humidity" step="0.1" placeholder="예: 60">
+    
+    <button onclick="calculateDewPoint()">계산하기</button>
+    
+    <div id="result"></div>
+</div>
 
-    function recalc(){
-      const dry = toNum(el("dry").value);
-      const wet = toNum(el("wet").value);
-      const surf = toNum(el("surf").value);
-      
-      const Td = unit==="C" ? dry : (dry!==null ? FtoC(dry) : null);
-      const Tw = unit==="C" ? wet : (wet!==null ? FtoC(wet) : null);
-      const Ts = unit==="C" ? surf: (surf!==null? FtoC(surf): null);
+<script>
+    function calculateDewPoint() {
+        const T = parseFloat(document.getElementById('temp').value);
+        const RH = parseFloat(document.getElementById('humidity').value);
 
-      if(Td===null || Tw===null){
-        el("rh").textContent = "—"; el("dp").textContent = "—"; el("deltat").textContent = "—";
-        el("deltat").className = "value";
-        return;
-      }
-      
-      const RH = rhFromDryWet(Td, Tw);
-      const e_act_hPa = (RH/100) * es(Td);
-      const DPc = invMagnus(e_act_hPa);
-      const DP = unit==="C" ? DPc : CtoF(DPc);
-      const DT = (Ts===null) ? null : (unit==="C" ? (Ts - DPc) : (CtoF(Ts) - CtoF(DPc)));
-
-      el("rh").textContent = RH.toFixed(0);
-      el("dp").textContent = fmt(DP);
-      
-      if(DT!==null){
-        el("deltat").textContent = fmt(DT);
-        const threshold = unit==="C" ? 3 : 5;
-        el("deltat").className = "value " + (DT < threshold ? "risk" : "cool");
-      } else {
-        el("deltat").textContent = "—";
-        el("deltat").className = "value";
-      }
-    }
-
-    function setUnit(next){
-      if(unit===next) return;
-      ["dry","wet","surf"].forEach(id => {
-        const v = toNum(el(id).value);
-        if(v!==null) el(id).value = fmt(next==="F" ? CtoF(v) : FtoC(v));
-      });
-      unit = next;
-      document.querySelectorAll(".unit-badge").forEach(b => {
-        if(b.textContent.includes("°")) b.textContent = `°${unit}`;
-      });
-      el("btnC").classList.toggle("active", unit==="C");
-      el("btnF").classList.toggle("active", unit==="F");
-      recalc();
-    }
-
-    // Photo Handling (Fixed: Unique Indexing for Files)
-    function saveImageFile(file, index) {
-        const memoValue = el("memo").value.trim() || "Photo";
-        const dateStr = filenameTs();
-        const extension = file.name.split('.').pop() || 'jpg';
-        // 파일명 중복 방지를 위해 인덱스(_1, _2) 추가
-        const fileName = `${memoValue}_${dateStr}_${index}.${extension}`;
-
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(file);
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-
-    function setupPhoto(idx) {
-        const container = el(`photo-container-${idx}`);
-        const input = el(`photo-input-${idx}`);
-        const img = el(`captured-photo-${idx}`);
-        const placeholder = el(`photo-placeholder-text-${idx}`);
-        
-        container.onclick = () => input.click();
-        
-        input.onchange = (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                img.src = URL.createObjectURL(file);
-                img.style.display = 'block';
-                placeholder.style.display = 'none';
-                saveImageFile(file, idx);
-            }
-        };
-    }
-
-    // Function: Save CSV
-    function saveCSV() {
-        const dry = el("dry").value;
-        const wet = el("wet").value;
-        const surf = el("surf").value;
-        if (!dry && !wet && !surf) return;
-
-        const memo = el("memo").value || '';
-        const rh = el("rh").textContent || '—';
-        const dp = el("dp").textContent || '—';
-        const deltat = el("deltat").textContent || '—';
-        const time = el("memo-datetime").textContent;
-        
-        const row = `"${memo}",${dry},${wet},${surf},${rh},${dp},${deltat},${unit},"${time}"\n`;
-        let csv = localStorage.getItem(DATA_LOG_KEY) || "Memo,Dry,Wet,Surf,RH,DP,DT,Unit,Time\n";
-        csv += row;
-        localStorage.setItem(DATA_LOG_KEY, csv);
-
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `hygro_data_${filenameTs()}.csv`;
-        link.click();
-    }
-
-    // Function: Share Image (Only shares capture-area)
-    async function shareImage() {
-        const area = el("capture-area");
-        try {
-            const canvas = await html2canvas(area, {
-                scale: 2,
-                backgroundColor: getComputedStyle(document.body).getPropertyValue('--bg'),
-                useCORS: true,
-                logging: false,
-                // Add padding to capture area to look like a clean card
-                onclone: (clonedDoc) => {
-                  const clonedArea = clonedDoc.getElementById('capture-area');
-                  clonedArea.style.padding = '10px';
-                }
-            });
-            const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
-            const memoName = el("memo").value.trim() || "HygroResult";
-            const file = new File([blob], `${memoName}_${filenameTs()}.png`, { type: 'image/png' });
-
-            if (navigator.share && navigator.canShare({ files: [file] })) {
-                await navigator.share({ files: [file], title: "Hygrometer Result" });
-            } else {
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = file.name;
-                link.click();
-            }
-        } catch (err) {
-            console.error("Screenshot error:", err);
+        if (isNaN(T) || isNaN(RH)) {
+            document.getElementById('result').innerText = "값을 올바르게 입력해주세요.";
+            return;
         }
+
+        // Magnus 공식 상수
+        const a = 17.625;
+        const b = 243.04;
+
+        // 알파 계산
+        const alpha = Math.log(RH / 100) + ((a * T) / (b + T));
+        
+        // 이슬점 계산
+        const dewPoint = (b * alpha) / (a - alpha);
+
+        document.getElementById('result').innerText = `계산된 이슬점: ${dewPoint.toFixed(2)}°C`;
     }
+</script>
 
-    // Init
-    document.addEventListener('DOMContentLoaded', () => {
-      ["dry","wet","surf","memo"].forEach(id => el(id).oninput = recalc);
-      el("btnC").onclick = () => setUnit("C");
-      el("btnF").onclick = () => setUnit("F");
-      el("btnSaveData").onclick = saveCSV;
-      el("btnShare").onclick = shareImage;
-      el("btnToggleTheme").onclick = () => {
-          document.body.classList.toggle("light-theme");
-          el("themeText").textContent = document.body.classList.contains("light-theme") ? "Dark Mode" : "Light Mode";
-      };
-      el("btnClear").onclick = () => {
-          ["dry","wet","surf","memo"].forEach(id => el(id).value = "");
-          [1, 2].forEach(i => {
-              el(`captured-photo-${i}`).style.display = 'none';
-              el(`photo-placeholder-text-${i}`).style.display = 'block';
-              el(`photo-input-${i}`).value = "";
-          });
-          localStorage.removeItem(DATA_LOG_KEY);
-          recalc();
-      };
-
-      setupPhoto(1);
-      setupPhoto(2);
-      
-      setInterval(() => { el("memo-datetime").textContent = ts(); }, 1000);
-      el("memo-datetime").textContent = ts();
-    });
-  </script>
 </body>
 </html>
